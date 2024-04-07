@@ -4,7 +4,7 @@ import torch.optim as optim
 import numpy as np
 from torchvision.transforms import v2 as transformsV2
 from torch.utils.data import DataLoader
-from DataAugmentationAndSplit.Dataset import MyDataset
+from Dataset import MyDataset
 
 class MyNetwork(nn.Module):
     def __init__(self, input_channels):
@@ -85,8 +85,8 @@ loss_fun = nn.CrossEntropyLoss()
 
 
 
-root_directory = "Data\\Dataset"
-image_path = "Data\\Dataset\\5\\20150709_D39M_IV.jpeg"
+root_directory = "WindTurbineImagesCategorization\\Data\\Dataset"
+image_path = "WindTurbineImagesCategorization\\Data\\Dataset\\5\\20150709_D39M_IV.jpeg"
 mode = "train"
 split = {"train": 0.6, "val": 0.2, "test": 0.2}
 mean = np.array([0.5750, 0.6065, 0.6459])
@@ -123,52 +123,52 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # Initializing the list for storing the loss and accuracy
 
-train_loss_history = [] # loss
-train_acc_history = [] # accuracy
+# train_loss_history = [] # loss
+# train_acc_history = [] # accuracy
 
-for epoch in range(1):
+# for epoch in range(1):
 
        
-    running_loss = 0.0
-    correct = 0.0
-    total = 0
+#     running_loss = 0.0
+#     correct = 0.0
+#     total = 0
     
-    # Iterating through the minibatches of the data
+#     # Iterating through the minibatches of the data
     
-    for i, data in enumerate(MyDataloader, 0):
+#     for i, data in enumerate(MyDataloader, 0):
         
-        # data is a tuple of (inputs, labels)
-        X, y = data
-        y = y-1
-        print(y)
-        X = X.to(device)
-        y = y.long().to(device)
-        # y = y.to(device)
-        # Reset the parameter gradients  for the current minibatch iteration 
-        optimizer.zero_grad()
-
-        
-        y_pred = model(X)             # Perform a forward pass on the network with inputs
-        loss = loss_fun(y_pred, y) # calculate the loss with the network predictions and ground Truth
-        loss.backward()             # Perform a backward pass to calculate the gradients
-        optimizer.step()            # Optimize the network parameters with calculated gradients
+#         # data is a tuple of (inputs, labels)
+#         X, y = data
+#         y = y-1
+#         print(y)
+#         X = X.to(device)
+#         y = y.long().to(device)
+#         # y = y.to(device)
+#         # Reset the parameter gradients  for the current minibatch iteration 
+#         optimizer.zero_grad()
 
         
-        # Accumulate the loss and calculate the accuracy of predictions
-        running_loss += loss.item()
-        _, preds = torch.max(y_pred, 1) #convert output probabilities of each class to a singular class prediction
-        correct += preds.eq(y).sum().item()
-        total += y.size(0)
+#         y_pred = model(X)             # Perform a forward pass on the network with inputs
+#         loss = loss_fun(y_pred, y) # calculate the loss with the network predictions and ground Truth
+#         loss.backward()             # Perform a backward pass to calculate the gradients
+#         optimizer.step()            # Optimize the network parameters with calculated gradients
 
-        # Print statistics to console
-        if i % 1000 == 999: # print every 1000 mini-batches
-            running_loss /= 1000
-            correct /= total
-            print("[Epoch %d, Iteration %5d] loss: %.3f acc: %.2f %%" % (epoch+1, i+1, running_loss, 100*correct))
-            train_loss_history.append(running_loss)
-            train_acc_history.append(correct)
-            running_loss = 0.0
-            correct = 0.0
-            total = 0
+        
+#         # Accumulate the loss and calculate the accuracy of predictions
+#         running_loss += loss.item()
+#         _, preds = torch.max(y_pred, 1) #convert output probabilities of each class to a singular class prediction
+#         correct += preds.eq(y).sum().item()
+#         total += y.size(0)
 
-print('FINISH.')
+#         # Print statistics to console
+#         if i % 1000 == 999: # print every 1000 mini-batches
+#             running_loss /= 1000
+#             correct /= total
+#             print("[Epoch %d, Iteration %5d] loss: %.3f acc: %.2f %%" % (epoch+1, i+1, running_loss, 100*correct))
+#             train_loss_history.append(running_loss)
+#             train_acc_history.append(correct)
+#             running_loss = 0.0
+#             correct = 0.0
+#             total = 0
+
+# print('FINISH.')

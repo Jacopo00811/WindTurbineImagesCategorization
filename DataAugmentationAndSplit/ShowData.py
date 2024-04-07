@@ -2,13 +2,19 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
 from torchvision.transforms import v2 as transformsV2
-from Dataset import MyDataset
+import sys
+import os
 import torch
 from PIL import Image
+# Add the parent directory of the current script to the Python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+from Network.Dataset import MyDataset
 
 def main():
-    root_directory = "Data\\Dataset"
-    image_path = "Data\\Dataset\\5\\20150709_D39M_IV.jpeg"
+    root_directory = "WindTurbineImagesCategorization\\Data\\Dataset"
+    image_path = "WindTurbineImagesCategorization\\Data\\Dataset\\5\\20150709_D39M_IV.jpeg"
     mode = "train"
     split = {"train": 0.6, "val": 0.2, "test": 0.2}
     mean = np.array([0.5750, 0.6065, 0.6459])
