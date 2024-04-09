@@ -120,25 +120,22 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_val, op
     validation_loss = 0
     for epoch in range(epochs):  # loop over the dataset multiple times
         
-        # Train
+        """    Train step for one batch of data    """
         training_loop = create_tqdm_bar(dataloader_train, desc=f'Training Epoch [{epoch+1}/{epochs}]')
         training_loss = 0
         #for i, data in enumerate(trainloader, 0):
         for train_iteration, batch in training_loop:
+            model.train()  # Set the model to training mode
+            optimizer.zero_grad() # Reset the parameter gradients for the current minibatch iteration
 
             images, labels = batch
-            labels -= 1
+            labels -= 1 # Change the labels to start from 0
 
             labels = labels.type(torch.LongTensor)
-            # images = images.type(torch.FloatTensor)
             
             labels = labels.to(device)
             images = images.to(device)
-            
-            model.train()  # Set the model to training mode
-            # Reset the parameter gradients for the current minibatch iteration 
-            optimizer.zero_grad()
-            
+
             # forward + backward + optimize
             predicted_labels = model(images)
 
@@ -166,18 +163,16 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_val, op
             #                                                        train_iteration+1,
             #                                                        training_loss / (len(dataloader_train)*epoch+train_iteration)))
         
-        #print('Finished Training')
 
-        # Validation
+        """    Validation step for one batch of data    """
         val_loop = create_tqdm_bar(dataloader_val, desc=f'Validation Epoch [{epoch+1}/{epochs}]')
         validation_loss = 0
         with torch.no_grad():
             for val_iteration, batch in val_loop:
                 model.eval()  # Set the model to evaluation mode
                 with torch.no_grad():
-                    # Extract data from the batch
                     images, labels = batch
-                    labels -= 1
+                    labels -= 1 # Change the labels to start from 0
                     labels = labels.type(torch.LongTensor)
                     
                     images = images.to(device)
@@ -274,7 +269,6 @@ train_net(model, loss_function, DEVICE, dataloader_train, dataloader_validation,
 # path = os.path.join('logs', 'cls_logs')
 # num_of_runs = len(os.listdir(path)) if os.path.exists(path) else 0
 # path = os.path.join(path, f'run_{num_of_runs + 1}')
-
 # tb_logger = SummaryWriter(path)
 
 
