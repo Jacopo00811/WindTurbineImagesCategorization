@@ -28,8 +28,7 @@ class MyDataset(Dataset):
         self.split = split
 
 
-        self.classes, self.class_to_idx = self._find_classes(
-            self.root_directory)
+        self.classes, self.class_to_idx = self._find_classes(self.root_directory)
 
         self.images, self.labels = self.make_dataset(
             directory=self.root_directory,
@@ -39,10 +38,10 @@ class MyDataset(Dataset):
         
         # mean, std = calculate_mean_and_std(self.root_directory) hardcoded for speed
         self.val_and_test_transform = transformsV2.Compose([ 
+            transformsV2.Resize((224, 224)),
             transformsV2.ToImage(), 
             transformsV2.ToDtype(torch.float32, scale=True),
-            transformsV2.Resize((249, 249)),
-            transformsV2.Normalize(mean=[146.55023939, 154.74381517, 164.83658595], std=[47.73365568, 44.97275564, 46.04307478]),
+            transformsV2.Normalize(mean=[0.5750, 0.6065, 0.6459], std=[0.1854, 0.1748, 0.1794]),
         ])
 
     @staticmethod
@@ -54,8 +53,7 @@ class MyDataset(Dataset):
           - classes is the list of all classes found
           - class_to_idx is a dict that maps class to label
         """
-        classes = [folder.name for folder in os.scandir(
-            directory) if folder.is_dir()]
+        classes = [folder.name for folder in os.scandir(directory) if folder.is_dir()]
         classes.sort()
         class_to_idx = {classes[i]: i+1 for i in range(len(classes))} # Changed the index to start from 1 as actual labels
         return classes, class_to_idx
@@ -67,8 +65,7 @@ class MyDataset(Dataset):
         :param images, a list containing paths to all images in the dataset
         :param labels, a list containing one label per image
 
-        :returns (images, labels), where only the indices for the
-            corresponding data split are selected.
+        :returns (images, labels), where only the indices for the corresponding data split are selected.
         """
         fraction_train = self.split["train"]
         fraction_val = self.split["val"]
@@ -134,7 +131,7 @@ class MyDataset(Dataset):
         
         if self.transform is not None and self.mode == "train":
             image = self.transform(image)
-        elif self.transform is not None and (self.mode == "val" or self.mode == "test"):
+        elif self.transform is None and (self.mode == "val" or self.mode == "test"):
             image = self.val_and_test_transform(image)
 
         return image, label
