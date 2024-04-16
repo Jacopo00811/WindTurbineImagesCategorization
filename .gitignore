@@ -1,5 +1,6 @@
 # Ignore compiled Python files
 *.pyc
+*.zip
 
 # Ignore virtual environment folders
 venv/
@@ -16,3 +17,4 @@ config.ini
 __pycache__/
 
 Data/
+runs/
