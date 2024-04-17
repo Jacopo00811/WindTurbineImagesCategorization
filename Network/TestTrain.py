@@ -12,7 +12,8 @@ from Dataset import MyDataset
 from tqdm import tqdm
 from Network import MyNetwork
 import os
-from torch.utils.tensorboard.writer import SummaryWriter
+# from torch.utils.tensorboard.writer import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 
 # %load_ext autoreload
@@ -26,8 +27,9 @@ from torch.utils.tensorboard.writer import SummaryWriter
 # %%
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
-ROOT_DIRTECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\Dataset"
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# ROOT_DIRTECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\Dataset"
+ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/Dataset"
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 
 # %% [markdown]
@@ -63,10 +65,10 @@ hyper_parameters = {
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
-    "batch size": 64,
+    "batch size": 32,
     "number of workers": 0,
     "learning rate": 0.0002,
-    "epochs": 100,
+    "epochs": 10,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
@@ -80,10 +82,10 @@ hyper_parameters = {
 
 # %%
 # Create Datasets and Dataloaders
-dataset_train = MyDataset(root_directory=ROOT_DIRTECTORY, mode="train",
+dataset_train = MyDataset(root_directory=ROOT_DIRECTORY, mode="train",
                           transform=transform, split=hyper_parameters["split"])
 print(f"Created a new Dataset for training of length: {len(dataset_train)}")
-dataset_validation = MyDataset(root_directory=ROOT_DIRTECTORY,
+dataset_validation = MyDataset(root_directory=ROOT_DIRECTORY,
                                mode="val", transform=None, split=hyper_parameters["split"])
 print(f"Created a new Dataset for validation of length: {
       len(dataset_validation)}")
@@ -125,7 +127,7 @@ if torch.cuda.is_available():
 
 # %%
 # Determine the path for saving logs
-logs_dir = 'runs/logs'
+logs_dir = 'runs'
 os.makedirs(logs_dir, exist_ok=True)
 num_of_runs = len(os.listdir(logs_dir))
 run_dir = os.path.join(logs_dir, f'run_{num_of_runs + 1}')
@@ -212,8 +214,8 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
                 #     val_iteration+1), epoch*len(dataloader_validation)+train_iteration)
 
             # This value is for the progress bar of the training loop.
-            validation_loss /= len(dataloader_validation)
-        logger.add_scalars(f'{name}/Combined', {'val_loss': validation_loss,
+            # validation_loss /= len(dataloader_validation)
+        logger.add_scalars(f'{name}/Combined', {'val_loss': validation_loss/len(dataloader_validation),
                                                 'train_loss': training_loss/len(dataloader_train)}, epoch)
         logger.add_scalar(f'{name}/val_loss', validation_loss /
                           len(dataloader_validation), epoch)
@@ -221,7 +223,7 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
         print(scheduler.get_last_lr())
 
 # %%
-# train_net(model, loss_function, DEVICE, dataloader_train,
-#           dataloader_validation, optimizer, hyper_parameters, logger, scheduler, name="default")
+train_net(model, loss_function, DEVICE, dataloader_train,
+          dataloader_validation, optimizer, hyper_parameters, logger, scheduler, name="MyModelTestV3")
 
 
