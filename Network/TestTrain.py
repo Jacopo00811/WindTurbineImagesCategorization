@@ -178,13 +178,14 @@ if torch.cuda.is_available():
     torch.cuda.empty_cache()
 
 # Determine the path for saving logs
-logs_dir = 'WindTurbineImagesCategorization\\Network\\runs'
+logs_dir = 'WindTurbineImagesCategorization\\Network\\tests'
 os.makedirs(logs_dir, exist_ok=True)
 num_of_runs = len(os.listdir(logs_dir))
 run_dir = os.path.join(logs_dir, f'run_{num_of_runs + 1}')
 logger = SummaryWriter(run_dir)
+     
 
-train_net(model, loss_function, DEVICE, dataloader_train,
-          dataloader_validation, optimizer, hyper_parameters, logger, scheduler, name="MyModelTestV3")
+# train_net(model, loss_function, DEVICE, dataloader_train,
+#           dataloader_validation, optimizer, hyper_parameters, logger, scheduler, name="MyModelTestV3")
 
 # torch.save(model.state_dict(), "WindTurbineImagesCategorization\\Network\\Results")

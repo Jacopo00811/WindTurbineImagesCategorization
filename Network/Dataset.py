@@ -136,14 +136,14 @@ class MyDataset(Dataset):
         return length
 
     @staticmethod
-    def load_image_as_numpy(image_path):
-        """Load image from image_path as numpy array"""
+    def load_image_as_Image(image_path):
+        """Load image from image_path as Image object using PIL.Image.open()"""
         return Image.open(image_path)
     
     def __getitem__(self, index):
         label = self.labels[index]
         path = self.images[index]
-        image = self.load_image_as_numpy(path)
+        image = self.load_image_as_Image(path)
         
         if self.transform is not None and self.mode == "train":
             image = self.transform(image)
