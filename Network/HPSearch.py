@@ -51,8 +51,8 @@ def add_layer_weight_histograms(model, logger, model_name):
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
 CLASSES = ["0", "1", "2", "3", "4"]
-ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\Dataset"
-# ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/Dataset"
+# ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\Dataset"
+ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/Dataset"
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 hyper_parameters = {
@@ -61,12 +61,12 @@ hyper_parameters = {
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
     "number of workers": 0,
-    "epochs": 42,
+    "epochs": 30,
     "epsilon": 1e-08,
     "weight decay": 1e-08,
     'beta1': 0.9,
     'beta2': 0.999,
-    'step size': 14,
+    'step size': 10,
 }
 
 # %%
@@ -144,7 +144,7 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
             features = images.reshape(images.shape[0], -1)
             class_labels = [CLASSES[label] for label in predicted]  # predicted
 
-            if epoch > 20 and train_iteration == 5:  # Only the 5th iteration of each epoch after the 20th epoch
+            if epoch > 27 and train_iteration == 5:  # Only the 5th iteration of each epoch after the 27th epoch
                 logger.add_embedding(
                     features, metadata=class_labels, label_img=images, global_step=epoch, tag=f'{name}/Embedding')
 
@@ -233,12 +233,10 @@ def hyperparameter_search(loss_function, device, dataset_train, dataset_validati
         # Initialize model, optimizer, scheduler, logger, dataloader
         dataloader_train = DataLoader(
             dataset_train, batch_size=hyper_parameters["batch size"], shuffle=True, num_workers=hyper_parameters["number of workers"], drop_last=False)
-        print(f"Created a new Dataloader for training with batch size: {
-            hyper_parameters["batch size"]}")
+        print(f"Created a new Dataloader for training with batch size: {hyper_parameters["batch size"]}")
         dataloader_validation = DataLoader(dataset_validation, batch_size=hyper_parameters["batch size"], shuffle=True,
                                            num_workers=hyper_parameters["number of workers"], drop_last=False)
-        print(f"Created a new Dataloader for validation with batch size: {
-            hyper_parameters["batch size"]}")
+        print(f"Created a new Dataloader for validation with batch size: {hyper_parameters["batch size"]}")
         model = MyNetwork(hyper_parameters)
         model.weight_initialization()
         model.to(DEVICE)
@@ -281,8 +279,7 @@ dataset_train = MyDataset(root_directory=ROOT_DIRECTORY, mode="train",
 print(f"Created a new Dataset for training of length: {len(dataset_train)}")
 dataset_validation = MyDataset(root_directory=ROOT_DIRECTORY,
                                mode="val", transform=None, split=hyper_parameters["split"])
-print(f"Created a new Dataset for validation of length: {
-      len(dataset_validation)}\n")
+print(f"Created a new Dataset for validation of length: {len(dataset_validation)}\n")
 
 loss_function = nn.CrossEntropyLoss()
 
@@ -291,8 +288,7 @@ loss_function = nn.CrossEntropyLoss()
 all_combinations = create_combinations(hyperparameter_grid)
 # random_samples = sample_hyperparameters(hyperparameter_grid, 10)
 
-print(f"Number of combinations: {
-      len(all_combinations)} (amount of models to test)\n\n")
+print(f"Number of combinations: {len(all_combinations)} (amount of models to test)\n\n")
 best_hp = hyperparameter_search(
     loss_function, DEVICE, dataset_train, dataset_validation, all_combinations, hyper_parameters)
 
