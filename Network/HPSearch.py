@@ -60,7 +60,7 @@ hyper_parameters = {
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
-    "number of workers": 0,
+    "number of workers": 4,
     "epochs": 150,
     "epsilon": 1e-08,
     "weight decay": 1e-08,
