@@ -61,12 +61,12 @@ hyper_parameters = {
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
     "number of workers": 0,
-    "epochs": 30,
+    "epochs": 50,
     "epsilon": 1e-08,
     "weight decay": 1e-08,
     'beta1': 0.9,
     'beta2': 0.999,
-    'step size': 10,
+    'step size': 20,
 }
 
 # %%
@@ -132,8 +132,8 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
             # logger.add_image(f"{name}/batch images", img_grid, epoch)
 
             # Add the model graph to tensorboard
-            if epoch == 0 and train_iteration == 0:
-                logger.add_graph(model, images)
+            # if epoch == 0 and train_iteration == 0:
+            #     logger.add_graph(model, images)
 
             # Running train accuracy
             _, predicted = predicted_labels.max(1)
@@ -144,7 +144,7 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
             features = images.reshape(images.shape[0], -1)
             class_labels = [CLASSES[label] for label in predicted]  # predicted
 
-            if epoch > 27 and train_iteration == 5:  # Only the 5th iteration of each epoch after the 27th epoch
+            if epoch > 47 and train_iteration == 5:  # Only the 5th iteration of each epoch after the 27th epoch
                 logger.add_embedding(
                     features, metadata=class_labels, label_img=images, global_step=epoch, tag=f'{name}/Embedding')
 
@@ -212,9 +212,9 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
 # %%
 # Define your hyperparameter grid
 hyperparameter_grid = {
-    'learning rate': [0.0005, 0.0001, 0.001, 0.005],
+    'learning rate': [0.01, 0.001],
     'gamma': [0.8, 0.9, 0.7],
-    'batch size': [32, 64, 128],
+    'batch size': [64, 128],
 }
 
 # %%
@@ -251,8 +251,6 @@ def hyperparameter_search(loss_function, device, dataset_train, dataset_validati
         scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer, step_size=hyper_parameters["step size"], gamma=hyper_parameters["gamma"])
 
-        # logger = SummaryWriter(run_dir+f"V4_"+str(run_counter),
-        #                        comment=f'LR_{hyper_parameters["learning rate"]}')
         logger = SummaryWriter(run_dir+str(run_counter)+f" batch size_{hyper_parameters['batch size']} lr_{
                                hyper_parameters['learning rate']} gamma_{hyper_parameters['gamma']}")
 
