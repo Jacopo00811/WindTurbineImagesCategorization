@@ -61,12 +61,11 @@ hyper_parameters = {
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
     "number of workers": 0,
-    "epochs": 50,
+    "epochs": 150,
     "epsilon": 1e-08,
     "weight decay": 1e-08,
     'beta1': 0.9,
     'beta2': 0.999,
-    'step size': 20,
 }
 
 # %%
@@ -141,12 +140,12 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
             train_accuracy = float(num_correct)/float(images.shape[0])
             accuracies.append(train_accuracy)
 
-            features = images.reshape(images.shape[0], -1)
-            class_labels = [CLASSES[label] for label in predicted]  # predicted
+            # features = images.reshape(images.shape[0], -1)
+            # class_labels = [CLASSES[label] for label in predicted]  # predicted
 
-            if epoch > 47 and train_iteration == 5:  # Only the 5th iteration of each epoch after the 27th epoch
-                logger.add_embedding(
-                    features, metadata=class_labels, label_img=images, global_step=epoch, tag=f'{name}/Embedding')
+            # if epoch > 47 and train_iteration == 5:  # Only the 5th iteration of each epoch after the 27th epoch
+            #     logger.add_embedding(
+            #         features, metadata=class_labels, label_img=images, global_step=epoch, tag=f'{name}/Embedding')
 
             training_loop.set_postfix(train_loss="{:.8f}".format(
                 training_loss / (train_iteration + 1)), val_loss="{:.8f}".format(validation_loss))
@@ -213,8 +212,9 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
 # Define your hyperparameter grid
 hyperparameter_grid = {
     'learning rate': [0.01, 0.001],
-    'gamma': [0.8, 0.9, 0.7],
+    'gamma': [0.8, 0.9],
     'batch size': [64, 128],
+    'step size': [12, 20, 25],
 }
 
 # %%
