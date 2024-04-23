@@ -61,16 +61,17 @@ hyper_parameters = {
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
     "number of workers": 4,
-    "epochs": 150,
+    "epochs": 300,
     "epsilon": 1e-08,
     "weight decay": 1e-08,
     'beta1': 0.9,
     'beta2': 0.999,
+    'learning rate': 0.001,
 }
 
 # %%
 # logs_dir = 'WindTurbineImagesCategorization\\Network\\tests'
-logs_dir = "runs"
+logs_dir = "runsS"
 os.makedirs(logs_dir, exist_ok=True)
 run_dir = os.path.join(logs_dir, f'run_')
 
@@ -197,9 +198,15 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
                                                 'Train loss': training_loss/len(dataloader_train)}, epoch)
         scheduler.step()
         print(f"Current learning rate: {scheduler.get_last_lr()}")
+    # logger.add_hparams(
+    #     {'Lr': scheduler.get_last_lr(
+    #     )[0], 'Batch_size': hyper_parameters["batch size"], 'Gamma': hyper_parameters["gamma"]},
+    #     {f'Avg train loss': sum(all_train_losses)/len(all_train_losses),
+    #         f'Avg accuracy': sum(all_accuracies)/len(all_accuracies),
+    #         f'Avg val loss': sum(all_val_losses)/len(all_val_losses)}
+    # )
     logger.add_hparams(
-        {'Lr': scheduler.get_last_lr(
-        )[0], 'Batch_size': hyper_parameters["batch size"], 'Gamma': hyper_parameters["gamma"]},
+        {'Step_size': scheduler.step_size, 'Batch_size': hyper_parameters["batch size"], 'Gamma': hyper_parameters["gamma"]},
         {f'Avg train loss': sum(all_train_losses)/len(all_train_losses),
             f'Avg accuracy': sum(all_accuracies)/len(all_accuracies),
             f'Avg val loss': sum(all_val_losses)/len(all_val_losses)}
@@ -211,10 +218,9 @@ def train_and_validate_net(model, loss_function, device, dataloader_train, datal
 # %%
 # Define your hyperparameter grid
 hyperparameter_grid = {
-    'learning rate': [0.01, 0.001],
     'gamma': [0.8, 0.9],
     'batch size': [64, 128],
-    'step size': [12, 20, 25],
+    'step size': [20, 25, 30],
 }
 
 # %%
