@@ -35,7 +35,10 @@ class MyDataset(Dataset):
             class_to_idx=self.class_to_idx,
             mode=mode,
         )
-        
+ 
+        # Preload images
+        # self.preloaded_images = [self.transform(self.load_image(path)) for path in self.images if self.load_image(path) is not None]  # type: ignore
+
         # mean, std = calculate_mean_and_std(self.root_directory) hardcoded for speed
         self.test_transform = transformsV2.Compose([ 
             transformsV2.Resize((224, 224)),
@@ -136,20 +139,28 @@ class MyDataset(Dataset):
         return length
 
     @staticmethod
-    def load_image_as_Image(image_path):
+    def load_image(image_path):
         """Load image from image_path as Image object using PIL.Image.open()"""
-        return Image.open(image_path)
+        if image_path.endswith(".png"):
+            return Image.open(image_path)
+        elif image_path.endswith(".pt"):
+            return torch.load(image_path)
+        else:
+            raise ValueError("Unknown file type for image")
     
     def __getitem__(self, index):
         label = self.labels[index]
         path = self.images[index]
-        image = self.load_image_as_Image(path)
+        image = self.load_image(path)
         
         if self.transform is not None and self.mode == "train":
             image = self.transform(image)
         elif self.transform is None and self.mode == "val":
             image = self.val_transform(image)
-        elif self.transform is None and self.mode == "train":
+        elif self.transform is None and self.mode == "test":
             image = self.test_transform(image)
 
         return image, label
+
+    # def get_preloaded_images(self):
+    #     return self.preloaded_images
