@@ -125,7 +125,7 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
 # ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\Dataset"
-ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/Dataset"
+ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPNG"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 
@@ -188,7 +188,7 @@ loss_function = nn.CrossEntropyLoss()
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=hyper_parameters["step size"], gamma=hyper_parameters["gamma"])
 
 # Determine the path for saving logs
-logs_dir = 'run_{name}'
+logs_dir = f'run_{hyper_parameters["network name"]}'
 os.makedirs(logs_dir, exist_ok=True)
 # num_of_runs = len(os.listdir(logs_dir))
 # run_dir = os.path.join(logs_dir, f'run_{num_of_runs + 1}')
