@@ -150,7 +150,7 @@ hyper_parameters = {
     "batch size": 64,
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 180,
+    "epochs": 250,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
@@ -204,5 +204,5 @@ train_net(model, loss_function, DEVICE, dataloader_train,
 
 accuracy = check_accuracy(model, dataloader_test, DEVICE)
 
-save_dir =  os.path.join("WindTurbineImagesCategorization\\Network\\Results", f'{hyper_parameters["network name"]}_accuracy_{accuracy:.3f}.pth')
+save_dir =  os.path.join("Results_", f'{hyper_parameters["network name"]}_accuracy_{accuracy:.3f}.pth')
 torch.save(model.state_dict(), save_dir)
