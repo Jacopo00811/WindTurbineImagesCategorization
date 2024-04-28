@@ -9,6 +9,10 @@ from tqdm import tqdm
 from Network import MyNetwork
 import os
 from torch.utils.tensorboard.writer import SummaryWriter
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sn
+import pandas as pd
 # %load_ext autoreload
 # %autoreload 2
 # os.environ['KMP_DUPLICATE_LIB_OK']='True' # To prevent the kernel from dying
@@ -16,10 +20,13 @@ from torch.utils.tensorboard.writer import SummaryWriter
 def create_tqdm_bar(iterable, desc):
     return tqdm(enumerate(iterable), total=len(iterable), ncols=150, desc=desc)
 
-def check_accuracy(model, dataloader, DEVICE):
+def check_accuracy(model, dataloader, DEVICE, save_dir=None):
     model.eval()
     num_correct = 0
     num_samples = 0
+    y_true = []
+    y_pred = []
+    
     with torch.no_grad():
         for data in dataloader:
             image, label = data
@@ -33,9 +40,32 @@ def check_accuracy(model, dataloader, DEVICE):
             _, predictions = scores.max(1)
             num_correct += (predictions == label).sum()
             num_samples += predictions.size(0)
+            
+            output = (torch.max(torch.exp(scores), 1)[1]).data.cpu().numpy()
+            y_pred.extend(output) # Save Prediction
+            label = label.data.cpu().numpy()
+            y_true.extend(label) # Save Truth
 
     accuracy = float(num_correct)/float(num_samples)
     print(f"Got {num_correct}/{num_samples} with accuracy {accuracy* 100:.3f}")
+    classes = ('1', '2', '3', '4', '5') 
+    
+    # Create confusion matrix
+    cf_matrix = confusion_matrix(y_true, y_pred)
+    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None], index = [i for i in classes],
+                     columns = [i for i in classes])
+    plt.figure(figsize = (12,7))
+    sn.set_theme(font_scale=1.2)
+    sn.heatmap(df_cm, annot=True, fmt='d', cmap='Blues', xticklabels=classes, yticklabels=classes)
+    plt.xlabel('Predicted Label')
+    plt.ylabel('True Label')
+    plt.title(f'Confusion Matrix', fontsize=20, fontweight='bold', color='red')
+    if save_dir:
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
+        plt.close()
+
     model.train()
     return accuracy
 
@@ -202,7 +232,6 @@ if torch.cuda.is_available():
 train_net(model, loss_function, DEVICE, dataloader_train,
           dataloader_validation, optimizer, hyper_parameters, logger, scheduler, name=hyper_parameters["network name"])
 
-accuracy = check_accuracy(model, dataloader_test, DEVICE)
-
-save_dir =  os.path.join("Results_", f'{hyper_parameters["network name"]}_accuracy_{accuracy:.3f}.pth')
+accuracy = check_accuracy(model, dataloader_test, DEVICE, os.path.join("Results", f'{hyper_parameters["network name"]}'))
+save_dir =  os.path.join("Results", f'{hyper_parameters["network name"]}_accuracy_{accuracy:.3f}.pth')
 torch.save(model.state_dict(), save_dir)
