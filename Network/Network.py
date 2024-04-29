@@ -6,6 +6,7 @@ class MyNetwork(nn.Module):
         super(MyNetwork, self).__init__()
         self.input_channels = hyper_parameters["input channels"]
         self.number_of_classes = hyper_parameters["number of classes"]
+        self.pca = hyper_parameters.get("PCA", None)
 
         self.convolutional_layers = nn.Sequential(
             nn.Conv2d(in_channels=self.input_channels, out_channels=64, kernel_size=3, stride=1, padding=1),
@@ -43,19 +44,33 @@ class MyNetwork(nn.Module):
             nn.LeakyReLU(),            
             nn.MaxPool2d(kernel_size=4, stride=4, padding=0),
         )
-        
-        self.fully_connected_layers = nn.Sequential(
-            nn.Linear(512*7*7, 2048),
-            nn.LeakyReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(2048, 1024),
-            nn.LeakyReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(1024, 512),
-            nn.LeakyReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(512, self.number_of_classes)
-        )
+
+        if self.pca:
+            self.fully_connected_layers = nn.Sequential(
+                nn.Linear(3584, 2048), # 512*7*7
+                nn.LeakyReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(2048, 1024),
+                nn.LeakyReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(1024, 512),
+                nn.LeakyReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(512, self.number_of_classes)
+            )
+        else:
+            self.fully_connected_layers = nn.Sequential(
+                nn.Linear(512*7*7, 2048),
+                nn.LeakyReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(2048, 1024),
+                nn.LeakyReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(1024, 512),
+                nn.LeakyReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(512, self.number_of_classes)
+            )
 
     def forward(self, x):
         x = self.convolutional_layers(x)

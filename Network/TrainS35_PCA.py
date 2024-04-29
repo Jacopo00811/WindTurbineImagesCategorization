@@ -56,7 +56,7 @@ def check_accuracy(model, dataloader, DEVICE, save_dir=None):
                      columns = [i for i in classes])
     plt.figure(figsize = (12,7))
     sn.set_theme(font_scale=1.2)
-    sn.heatmap(df_cm, annot=True, fmt='d', cmap='Blues', xticklabels=classes, yticklabels=classes)
+    sn.heatmap(df_cm, annot=True, fmt='.2f', cmap='Blues', xticklabels=classes, yticklabels=classes)
     plt.xlabel('Predicted Label')
     plt.ylabel('True Label')
     plt.title(f'Confusion Matrix', fontsize=20, fontweight='bold', color='red')
@@ -154,7 +154,7 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
 
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
-# ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\Dataset"
+# ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPNG"
 ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPCA"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
@@ -174,13 +174,14 @@ transform = transformsV2.Compose([
 ])
 hyper_parameters = {
     "network name": "S35_PCA",
+    "PCA": True,
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
-    "batch size": 64,
+    "batch size": 128,
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 230,
+    "epochs": 400,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
@@ -190,15 +191,15 @@ hyper_parameters = {
 }
 
 # Create Datasets and Dataloaders
-dataset_train = MyDataset(root_directory=ROOT_DIRECTORY, mode="train", transform=transform, split=hyper_parameters["split"])
+dataset_train = MyDataset(root_directory=ROOT_DIRECTORY, mode="train", transform=transform, split=hyper_parameters["split"], pca=True)
 print(f"Created a new Dataset for training of length: {len(dataset_train)}")
-dataset_validation = MyDataset(root_directory=ROOT_DIRECTORY, mode="val", transform=None, split=hyper_parameters["split"])
+dataset_validation = MyDataset(root_directory=ROOT_DIRECTORY, mode="val", transform=None, split=hyper_parameters["split"], pca=True)
 print(f"Created a new Dataset for validation of length: {len(dataset_validation)}")
 dataloader_train = DataLoader(dataset_train, batch_size=hyper_parameters["batch size"], shuffle=True, num_workers=hyper_parameters["number of workers"], drop_last=False)
 print(f"Created a new Dataloader for training with batch size: {hyper_parameters["batch size"]}")
 dataloader_validation = DataLoader(dataset_validation, batch_size=hyper_parameters["batch size"], shuffle=True, num_workers=hyper_parameters["number of workers"], drop_last=False)
 print(f"Created a new Dataloader for validation with batch size: {hyper_parameters["batch size"]}")
-dataset_test = MyDataset(root_directory=ROOT_DIRECTORY, mode="test", transform=None, split=hyper_parameters["split"])
+dataset_test = MyDataset(root_directory=ROOT_DIRECTORY, mode="test", transform=None, split=hyper_parameters["split"], pca=True)
 print(f"Created a new Dataset for testing of length: {len(dataset_test)}")
 dataloader_test = DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=hyper_parameters["number of workers"], drop_last=False)
 print(f"Created a new Dataloader for testing with batch size: 1")
