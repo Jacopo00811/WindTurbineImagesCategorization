@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from torchvision.transforms import v2 as transformsV2
 from torch.utils.data import DataLoader
 from Dataset import MyDataset
 from tqdm import tqdm
@@ -159,19 +158,6 @@ ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Dat
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 
-# transform = transformsV2.Compose([
-#     transformsV2.Resize((224, 224)),
-#     transformsV2.RandomHorizontalFlip(p=0.5),
-#     transformsV2.RandomVerticalFlip(p=0.5),
-#     transformsV2.RandomAdjustSharpness(sharpness_factor=2, p=0.5),
-#     transformsV2.RandomAutocontrast(p=0.5),
-#     transformsV2.RandomRotation(degrees=[0, 90]),
-#     transformsV2.ColorJitter(brightness=0.25, saturation=0.20),
-#     # Replace deprecated ToTensor()
-#     transformsV2.ToImage(),
-#     transformsV2.ToDtype(torch.float32, scale=True),
-#     transformsV2.Normalize(mean=MEAN.tolist(), std=STD.tolist()),
-# ])
 hyper_parameters = {
     "network name": "S20_PCA",
     "PCA": True,
