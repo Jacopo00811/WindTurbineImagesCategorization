@@ -14,13 +14,14 @@ class MyDataset(Dataset):
     """
 
     def __init__(self, *args, root_directory, transform=None, mode="train", limit_files=None, 
-                 split={"train": 0.6, "val": 0.2, "test": 0.2}, **kwargs):
+                 split={"train": 0.6, "val": 0.2, "test": 0.2}, pca, **kwargs):
         super().__init__(*args, **kwargs)
 
         assert mode in ["train", "val", "test"], "wrong mode for dataset given"
         split_values = [v for _, v in split.items()]
         assert sum(split_values) == 1.0, "split values must sum up to 1"
 
+        self.pca = pca # State variable to check if the dataset is PCA dataset
         self.root_directory = root_directory
         self.transform = transform
         self.mode = mode
@@ -153,12 +154,18 @@ class MyDataset(Dataset):
         path = self.images[index]
         image = self.load_image(path)
         
-        if self.transform is not None and self.mode == "train":
+        if self.transform is not None and self.mode == "train" and not self.pca:
             image = self.transform(image)
-        elif self.transform is None and self.mode == "val":
+        elif self.transform is None and self.mode == "train" and self.pca: # PCA dataset 
+            pass # Do nothing
+        elif self.transform is None and self.mode == "val" and not self.pca:
             image = self.val_transform(image)
-        elif self.transform is None and self.mode == "test":
+        elif self.transform is None and self.mode == "test" and not self.pca:
             image = self.test_transform(image)
+        elif self.transform is not None and self.mode == "val" and self.pca:
+            pass # Do nothing
+        elif self.transform is not None and self.mode == "test" and self.pca:
+            pass # Do nothing
 
         return image, label
 

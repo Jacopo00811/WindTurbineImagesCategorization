@@ -38,7 +38,7 @@ def main():
         ]) 
 
     # Create Dataset and Dataloader
-    Dataset = MyDataset(root_directory=root_directory, mode=mode, transform=transform, split=split)
+    Dataset = MyDataset(root_directory=root_directory, mode=mode, transform=transform, split=split, pca=False)
     print(f"Created a new Dataset of length: {len(Dataset)}")
     MyDataloader = DataLoader(Dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, drop_last=drop_last)
     print(f"Created a new Dataloader with batch size: {batch_size}")

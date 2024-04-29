@@ -143,10 +143,10 @@ hyper_parameters = {
 
 # Create Datasets and Dataloaders
 dataset_train = MyDataset(root_directory=ROOT_DIRECTORY, mode="train",
-                          transform=transform, split=hyper_parameters["split"])
+                          transform=transform, split=hyper_parameters["split"], pca=False)
 print(f"Created a new Dataset for training of length: {len(dataset_train)}")
 dataset_validation = MyDataset(root_directory=ROOT_DIRECTORY,
-                               mode="val", transform=None, split=hyper_parameters["split"])
+                               mode="val", transform=None, split=hyper_parameters["split"], pca=False)
 print(f"Created a new Dataset for validation of length: {
       len(dataset_validation)}")
 dataloader_train = DataLoader(

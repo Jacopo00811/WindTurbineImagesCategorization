@@ -47,7 +47,7 @@ for pdf_name in pdf_names:
 
     for i in range(len(pdf)):
         page = pdf[i]
-        images = page.get_images()
+        images = page.get_images() # type: ignore
         firstImage = True # Flag to know if it is the first image in the page
 
         for image in images:

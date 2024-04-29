@@ -14,7 +14,7 @@ from Network.Dataset import MyDataset
 
 
 def PCA_for_image(image, components):
-    transformed_channels = torch.zeros(image.shape[0], image.shape[1], image.shape[2])
+    transformed_channels = torch.zeros(image.shape[0], image.shape[1], components)
     explained_var_ratios = np.array([])
 
     for channel_idx in range(image.shape[0]):
@@ -23,8 +23,9 @@ def PCA_for_image(image, components):
         pca.fit(channel)
         trans_pca = pca.transform(channel)
         explained_var_ratio = sum(pca.explained_variance_ratio_)
-        transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
-        transformed_channels[channel_idx, :, :] = transformed_channel
+        # transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
+        # transformed_channels[channel_idx, :, :] = transformed_channel
+        transformed_channels[channel_idx, :, :] = torch.from_numpy(trans_pca)
         explained_var_ratios = np.append(explained_var_ratios, explained_var_ratio)
 
     return transformed_channels, explained_var_ratios
@@ -34,19 +35,19 @@ def PCA_on_dataset(root_directory, save_root, transform, split, COMPONENTS):
     pca = PCA(n_components=COMPONENTS)
     for mode in mode:
         if mode == "train":
-            dataset_train = MyDataset(root_directory=root_directory, mode=mode, transform=transform, split=split)
+            dataset_train = MyDataset(root_directory=root_directory, mode=mode, transform=transform, split=split, pca=False)
             dataLoader_train = DataLoader(dataset_train, batch_size=1, shuffle=False, num_workers=0, drop_last=False)
             for i, (image, label) in enumerate(dataLoader_train):
                 label_folder = os.path.join(save_root, str(label.item()))
                 os.makedirs(label_folder, exist_ok=True)
                 image = image.squeeze(0) # Remove batch dimension
-                transformed_channels_train = torch.zeros(image.shape[0], image.shape[1], image.shape[2])
+                transformed_channels_train = torch.zeros(image.shape[0], image.shape[1], COMPONENTS)
                 for channel_idx in range(image.shape[0]):
                     channel = image[channel_idx, :, :]
                     pca.fit(channel)
                     trans_pca = pca.transform(channel)
-                    transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
-                    transformed_channels_train[channel_idx, :, :] = transformed_channel
+                    # transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
+                    transformed_channels_train[channel_idx, :, :] = torch.from_numpy(trans_pca) # transformed_channel
                 # Save transformed image
                 filename = f"image_{mode}_{i}.pt"
                 file_path = os.path.join(label_folder, filename)
@@ -54,18 +55,18 @@ def PCA_on_dataset(root_directory, save_root, transform, split, COMPONENTS):
                 print("Saved image with max value: ", transformed_channels_train.max(), "and min value: ", transformed_channels_train.min())
             print("\n PCA on train dataset completed\n")
         elif mode == "val":
-            dataset_val = MyDataset(root_directory=root_directory, mode=mode, transform=None, split=split)
+            dataset_val = MyDataset(root_directory=root_directory, mode=mode, transform=None, split=split, pca=False)
             dataLoader_val = DataLoader(dataset_val, batch_size=1, shuffle=False, num_workers=0, drop_last=False)
             for i, (image, label) in enumerate(dataLoader_val):
                 label_folder = os.path.join(save_root, str(label.item()))
                 os.makedirs(label_folder, exist_ok=True)
                 image = image.squeeze(0)
-                transformed_channels_val = torch.zeros(image.shape[0], image.shape[1], image.shape[2])
+                transformed_channels_val = torch.zeros(image.shape[0], image.shape[1], COMPONENTS)
                 for channel_idx in range(image.shape[0]):
                     channel = image[channel_idx, :, :]
                     trans_pca = pca.transform(channel)
-                    transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
-                    transformed_channels_val[channel_idx, :, :] = transformed_channel
+                    # transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
+                    transformed_channels_val[channel_idx, :, :] = torch.from_numpy(trans_pca) # transformed_channel
                 # Save transformed image
                 filename = f"image_{mode}_{i}.pt"
                 file_path = os.path.join(label_folder, filename)
@@ -73,18 +74,18 @@ def PCA_on_dataset(root_directory, save_root, transform, split, COMPONENTS):
                 print("Saved image with max value: ", transformed_channels_train.max(), "and min value: ", transformed_channels_train.min())
             print("\n PCA on validation dataset completed\n")
         elif mode == "test":
-            dataset_test = MyDataset(root_directory=root_directory, mode=mode, transform=None, split=split)
+            dataset_test = MyDataset(root_directory=root_directory, mode=mode, transform=None, split=split, pca=False)
             dataLoader_test = DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=0, drop_last=False)
             for i, (image, label) in enumerate(dataLoader_test):
                 label_folder = os.path.join(save_root, str(label.item()))
                 os.makedirs(label_folder, exist_ok=True)
                 image = image.squeeze(0)
-                transformed_channels_test = torch.zeros(image.shape[0], image.shape[1], image.shape[2])
+                transformed_channels_test = torch.zeros(image.shape[0], image.shape[1], COMPONENTS)
                 for channel_idx in range(image.shape[0]):
                     channel = image[channel_idx, :, :]
                     trans_pca = pca.transform(channel)
-                    transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
-                    transformed_channels_test[channel_idx, :, :] = transformed_channel
+                    # transformed_channel = torch.from_numpy(pca.inverse_transform(trans_pca))
+                    transformed_channels_test[channel_idx, :, :] = torch.from_numpy(trans_pca) # transformed_channel
                 # Save transformed image
                 filename = f"image_{mode}_{i}.pt"
                 file_path = os.path.join(label_folder, filename)
@@ -231,7 +232,7 @@ COMPONENTS = 50
 split = {"train": 0.6, "val": 0.2, "test": 0.2}
 mean = np.array([0.5750, 0.6065, 0.6459])
 std = np.array([0.1854, 0.1748, 0.1794])
-root_directory = "WindTurbineImagesCategorization\\Data\\DatasetPNG"
+# root_directory = "WindTurbineImagesCategorization\\Data\\DatasetPNG"
 save_root = "WindTurbineImagesCategorization\\Data\\Test"
 
 transform = transformsV2.Compose([
@@ -248,5 +249,27 @@ transform = transformsV2.Compose([
     ]) 
 
 # PCA_on_dataset(root_directory, save_root, transform, split, COMPONENTS)
+
+# image = torch.load("WindTurbineImagesCategorization\\Data\\Test\\2\\image_test_11.pt")
+# print(image.shape)
+# print(image.max(), image.min())
+root_directory = "WindTurbineImagesCategorization\\Data\\Test"
 # image_path = "WindTurbineImagesCategorization\\Data\\Dataset\\4\\20180430_VN7N_II.jpeg"
+# image = Image.open(image_path)
+# image = transform(image)
+# print(image.shape)
+# new_image, values = PCA_for_image(image, COMPONENTS)
+# print(new_image.shape)
+# print(values)
+# plt.imshow(new_image.permute(1, 2, 0))
+# plt.show()
 # show_PCA_for_sample(image_path, COMPONENTS, transform)
+
+
+dataset = MyDataset(root_directory=root_directory, mode="train", transform=None, split=split, pca=True)
+dataLoader = DataLoader(dataset, batch_size=16, shuffle=True, num_workers=0, drop_last=False)
+
+batch = next(iter(dataLoader))
+print(batch[0].shape)
+print(batch[0][0].shape)
+print(batch[0][0].max(), batch[0][0].min())
