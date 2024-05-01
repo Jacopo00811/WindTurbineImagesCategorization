@@ -7,47 +7,81 @@ class MyNetwork(nn.Module):
         self.input_channels = hyper_parameters["input channels"]
         self.number_of_classes = hyper_parameters["number of classes"]
         self.pca = hyper_parameters.get("PCA", None)
+        
+        if self.pca:
+            self.convolutional_layers = nn.Sequential(
+                nn.Conv2d(in_channels=self.input_channels, out_channels=64, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(64),
+                nn.LeakyReLU(),
 
-        self.convolutional_layers = nn.Sequential(
-            nn.Conv2d(in_channels=self.input_channels, out_channels=64, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(64),
-            nn.LeakyReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+                nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(128),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(128),
+                nn.LeakyReLU(),            
 
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(128),
-            nn.LeakyReLU(),
-            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(128),
-            nn.LeakyReLU(),            
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+                nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
+                nn.LeakyReLU(), 
+                nn.Conv2d(in_channels=256, out_channels=256, kernel_size=1, stride=1, padding=0),
+                nn.BatchNorm2d(256),
+                nn.LeakyReLU(),            
 
-            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256),
-            nn.LeakyReLU(),
-            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256),
-            nn.LeakyReLU(), 
-            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=1, stride=1, padding=0),
-            nn.BatchNorm2d(256),
-            nn.LeakyReLU(),            
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+                nn.Conv2d(in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(512),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(512),
+                nn.LeakyReLU(), 
+                nn.Conv2d(in_channels=512, out_channels=512, kernel_size=1, stride=1, padding=0),
+                nn.BatchNorm2d(512),
+                nn.LeakyReLU(),            
+            )
+        else:
+            self.convolutional_layers = nn.Sequential(
+                nn.Conv2d(in_channels=self.input_channels, out_channels=64, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(64),
+                nn.LeakyReLU(),
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
 
-            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.LeakyReLU(),
-            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.LeakyReLU(), 
-            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=1, stride=1, padding=0),
-            nn.BatchNorm2d(512),
-            nn.LeakyReLU(),            
-            nn.MaxPool2d(kernel_size=4, stride=4, padding=0),
-        )
+                nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(128),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(128),
+                nn.LeakyReLU(),            
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+
+                nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
+                nn.LeakyReLU(), 
+                nn.Conv2d(in_channels=256, out_channels=256, kernel_size=1, stride=1, padding=0),
+                nn.BatchNorm2d(256),
+                nn.LeakyReLU(),            
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+
+                nn.Conv2d(in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(512),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(512),
+                nn.LeakyReLU(), 
+                nn.Conv2d(in_channels=512, out_channels=512, kernel_size=1, stride=1, padding=0),
+                nn.BatchNorm2d(512),
+                nn.LeakyReLU(),            
+                nn.MaxPool2d(kernel_size=4, stride=4, padding=0),
+            )
 
         if self.pca:
             self.fully_connected_layers = nn.Sequential(
-                nn.Linear(3584, 2048), # 512*7*7
+                nn.Linear(12800, 2048),
                 nn.LeakyReLU(),
                 nn.Dropout(0.5),
                 nn.Linear(2048, 1024),
