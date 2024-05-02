@@ -16,7 +16,8 @@ from torch.utils.data import ConcatDataset
 
 # TODO: Add directory and remove unsued imports
 
-torch_home = 'C:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\TransferLearning\\TorchvisionModels'
+# torch_home = 'C:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\TransferLearning\\TorchvisionModels'
+torch_home = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/TransferLearning/TorchvisionModels"
 os.environ['TORCH_HOME'] = torch_home
 os.makedirs(torch_home, exist_ok=True)
 backbones = ["vgg19_bn", "mobilenet_v3_large", "resnet152"]
