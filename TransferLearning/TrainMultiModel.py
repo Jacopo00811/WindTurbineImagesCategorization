@@ -193,19 +193,22 @@ def automatic_fine_tune(hyper_parameters, modeltype, device, loss_function, data
     print("\nFinished training new layers!\n")
 
     # Train classifier layers
-    model.fine_tune(FineTuneMode.CLASSIFIER)
-    STATE += 1
-    new_hp = filter_hp_from_list(hyper_parameters, STATE)
-    optimizer = optim.Adam(model.parameters(),
-                       lr=new_hp["learning rate"],
-                       betas=(new_hp["beta1"],
-                              new_hp["beta2"]),
-                       weight_decay=new_hp["weight decay"],
-                       eps=new_hp["epsilon"])
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=new_hp["step size"], gamma=new_hp["gamma"])
-    train_net(model, loss_function, device, dataloader_train,
-          dataloader_validation, optimizer, new_hp, logger, scheduler, state="CLASSIFIER", name=new_hp["network name"])
-    print("\nFinished training classifier layers!\n")
+    if modeltype == "resnet152":
+        STATE += 1
+    else:
+        model.fine_tune(FineTuneMode.CLASSIFIER)
+        STATE += 1
+        new_hp = filter_hp_from_list(hyper_parameters, STATE)
+        optimizer = optim.Adam(model.parameters(),
+                        lr=new_hp["learning rate"],
+                        betas=(new_hp["beta1"],
+                                new_hp["beta2"]),
+                        weight_decay=new_hp["weight decay"],
+                        eps=new_hp["epsilon"])
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=new_hp["step size"], gamma=new_hp["gamma"])
+        train_net(model, loss_function, device, dataloader_train,
+            dataloader_validation, optimizer, new_hp, logger, scheduler, state="CLASSIFIER", name=new_hp["network name"])
+        print("\nFinished training classifier layers!\n")
 
     # Fine tune all layers
     model.fine_tune(FineTuneMode.ALL_LAYERS)
@@ -241,8 +244,8 @@ def automatic_fine_tune(hyper_parameters, modeltype, device, loss_function, data
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
 MODELTYPE = ["mobilenet_v3_large", "resnet152", "vgg19_bn"]
-# ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPNG"
-ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPNG"
+ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPNG"
+# ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPNG"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 transform = transformsV2.Compose([
