@@ -73,7 +73,8 @@ def check_accuracy(model, dataloader, DEVICE, save_dir=None):
             y_true.extend(label) # Save Truth
 
     accuracy = float(num_correct)/float(num_samples)
-    print(f"Got {num_correct}/{num_samples} with accuracy {accuracy* 100:.3f}\n\n")
+    print(f"Got {num_correct}/{num_samples} with accuracy {accuracy* 100:.3f}")
+    print("\n\n")
     model.train()
     return accuracy
 
