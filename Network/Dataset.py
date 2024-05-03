@@ -99,7 +99,7 @@ class MyDataset(Dataset):
         rand_perm = np.random.permutation(num_samples)
 
         if mode == "train":
-            idx = rand_perm[:num_train]
+            idx = rand_perm[:num_train] # type: ignore
         elif mode == "val":
             idx = rand_perm[num_train:num_train+num_valid]
         elif mode == "test":
