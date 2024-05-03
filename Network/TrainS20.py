@@ -160,18 +160,19 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 
 transform = transformsV2.Compose([
-    transformsV2.Resize((224, 224)),
+    transformsV2.Pad(300, padding_mode="reflect"),
     transformsV2.RandomHorizontalFlip(p=0.5),
     transformsV2.RandomVerticalFlip(p=0.5),
     transformsV2.RandomAdjustSharpness(sharpness_factor=2, p=0.5),
-    transformsV2.RandomAutocontrast(p=0.5),
+    transformsV2.RandomAutocontrast(p=0.5),  
     transformsV2.RandomRotation(degrees=[0, 90]),
     transformsV2.ColorJitter(brightness=0.25, saturation=0.20),
-    # Replace deprecated ToTensor()
-    transformsV2.ToImage(),
-    transformsV2.ToDtype(torch.float32, scale=True),
+    transformsV2.CenterCrop(224),
+    transformsV2.Resize((224, 224)), # Adjustable
+    transformsV2.ToImage(),                          # Replace deprecated ToTensor()    
+    transformsV2.ToDtype(torch.float32, scale=True), # Replace deprecated ToTensor() 
     transformsV2.Normalize(mean=MEAN.tolist(), std=STD.tolist()),
-])
+    ]) 
 hyper_parameters = {
     "network name": "S20",
     "input channels": 3,

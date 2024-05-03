@@ -13,8 +13,8 @@ sys.path.append(parent_dir)
 from Network.Dataset import MyDataset
 
 def main():
-    root_directory = "WindTurbineImagesCategorization\\Data\\Dataset"
-    image_path = "WindTurbineImagesCategorization\\Data\\Dataset\\5\\20150709_D39M_IV.jpeg"
+    root_directory = "WindTurbineImagesCategorization\\Data\\DatasetPNG"
+    image_path = "WindTurbineImagesCategorization\\Data\\DatasetPNG\\5\\20150709_D39M_IV.png"
     mode = "train"
     split = {"train": 0.6, "val": 0.2, "test": 0.2}
     mean = np.array([0.5750, 0.6065, 0.6459])
@@ -25,13 +25,15 @@ def main():
     drop_last = False 
     num_workers = 0 
     transform = transformsV2.Compose([
-        transformsV2.Resize((224, 224)), # Adjustable
+        transformsV2.Pad(300, padding_mode="reflect"),
         transformsV2.RandomHorizontalFlip(p=0.5),
         transformsV2.RandomVerticalFlip(p=0.5),
         transformsV2.RandomAdjustSharpness(sharpness_factor=2, p=0.5),
         transformsV2.RandomAutocontrast(p=0.5),  
         transformsV2.RandomRotation(degrees=[0, 90]),
         transformsV2.ColorJitter(brightness=0.25, saturation=0.20),
+        transformsV2.CenterCrop(224),
+        transformsV2.Resize((224, 224)), # Adjustable
         transformsV2.ToImage(),                          # Replace deprecated ToTensor()    
         transformsV2.ToDtype(torch.float32, scale=True), # Replace deprecated ToTensor() 
         transformsV2.Normalize(mean=mean.tolist(), std=std.tolist()),
@@ -177,14 +179,4 @@ def rescale_0_1(image):
 
 if __name__ == "__main__":
     main()
-
-# # Create Dataset and Dataloader
-# Dataset = MyDataset(root_directory=root_directory, mode=mode, transform=transform, split=split)
-# print(f"Created a new Dataset of length: {len(Dataset)}")
-# MyDataloader = DataLoader(Dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, drop_last=drop_last)
-# print(f"Created a new Dataloader with batch size: {batch_size}")
-
-# batch = next(iter(MyDataloader))
-# plot_batch_by_label(batch)
-# plot_transformation_for_image_in_batch(image_path, mean, std)
 
