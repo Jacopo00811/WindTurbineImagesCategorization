@@ -278,7 +278,7 @@ def hyperparameter_search(modeltype, loss_function, device, dataset_train, datas
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
 CLASSES = ["0", "1", "2", "3", "4"]
-MODELTYPE = ["mobilenet_v3_large", "resnet152", "vgg19_bn"]
+MODELTYPE = ["vgg19_bn"]
 # ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPNG"
 ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPNG"
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -338,7 +338,7 @@ for model in MODELTYPE:
 
     # Perform hyperparameter search
     # all_combinations = create_combinations(hyperparameter_grid)
-    random_samples = sample_hyperparameters(hyperparameter_grid, 15)
+    random_samples = sample_hyperparameters(hyperparameter_grid, 10)
 
     print(f"Number of combinations: {len(random_samples)} (amount of models to test)\n\n")
     best_hp = hyperparameter_search(model, loss_function, DEVICE, dataset_train, dataset_validation, dataset_test, random_samples, hyper_parameters, run_dir)

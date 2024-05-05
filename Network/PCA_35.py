@@ -164,16 +164,16 @@ hyper_parameters = {
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
-    "batch size": 128,
+    "batch size": 64,
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 50,
+    "epochs": 35,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
     "weight decay": 1e-08,
-    "step size": 35,
-    "gamma": 0.9,
+    "step size": 10,
+    "gamma": 0.7,
 }
 
 # Create Datasets and Dataloaders
