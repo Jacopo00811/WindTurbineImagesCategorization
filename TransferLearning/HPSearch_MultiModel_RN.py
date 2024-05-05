@@ -194,7 +194,7 @@ def automatic_fine_tune(logger, hyper_parameters, modeltype, device, loss_functi
     print("\nFinished training new layers!\n")
 
     # Train classifier layers
-    if model == "resnet152":
+    if modeltype == "resnet152":
         STATE += 1
     else:
         model.fine_tune(FineTuneMode.CLASSIFIER)
