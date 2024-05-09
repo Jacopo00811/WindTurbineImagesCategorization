@@ -13,12 +13,22 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sn
 import pandas as pd
-# %load_ext autoreload
-# %autoreload 2
-# os.environ['KMP_DUPLICATE_LIB_OK']='True' # To prevent the kernel from dying
+import torchvision.transforms.functional as TF
+
 
 def create_tqdm_bar(iterable, desc):
     return tqdm(enumerate(iterable), total=len(iterable), ncols=150, desc=desc)
+
+def save_misclassified_images(misclassified, save_dir):
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    for idx, (images, labels, predictions) in enumerate(misclassified):
+        for i in range(images.size(0)):
+            image = TF.to_pil_image(images[i].cpu())
+            image_name = f"misclassified_{idx}_{i}_true_{labels[i]}_predicted_{predictions[i]}.png"
+            image_path = os.path.join(save_dir, image_name)
+            image.save(image_path)
 
 def check_accuracy(model, dataloader, DEVICE, save_dir=None):
     model.eval()
@@ -26,6 +36,7 @@ def check_accuracy(model, dataloader, DEVICE, save_dir=None):
     num_samples = 0
     y_true = []
     y_pred = []
+    misclassified = []
     
     with torch.no_grad():
         for data in dataloader:
@@ -46,6 +57,13 @@ def check_accuracy(model, dataloader, DEVICE, save_dir=None):
             label = label.data.cpu().numpy()
             y_true.extend(label) # Save Truth
 
+            # Check for misclassified images
+            misclassified_mask = predictions != label
+            misclassified_images = image[misclassified_mask]
+            misclassified_labels = label[misclassified_mask]
+            misclassified_predictions = predictions[misclassified_mask]
+            misclassified.extend(zip(misclassified_images, misclassified_labels, misclassified_predictions))
+
     accuracy = float(num_correct)/float(num_samples)
     print(f"Got {num_correct}/{num_samples} with accuracy {accuracy* 100:.3f}")
     classes = ('1', '2', '3', '4', '5') 
@@ -65,7 +83,9 @@ def check_accuracy(model, dataloader, DEVICE, save_dir=None):
             os.makedirs(save_dir)
         plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
         plt.close()
-
+    
+    save_misclassified_images(misclassified, save_dir)
+    
     model.train()
     return accuracy
 
@@ -181,12 +201,12 @@ hyper_parameters = {
     "batch size": 64,
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 800,
+    "epochs": 225,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
     "weight decay": 1e-08,
-    "step size": 25, # 20
+    "step size": 20,
     "gamma": 0.8,
 }
 

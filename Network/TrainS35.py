@@ -14,9 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sn
 import pandas as pd
 import torchvision.transforms.functional as TF
-# %load_ext autoreload
-# %autoreload 2
-# os.environ['KMP_DUPLICATE_LIB_OK']='True' # To prevent the kernel from dying
+
 
 def create_tqdm_bar(iterable, desc):
     return tqdm(enumerate(iterable), total=len(iterable), ncols=150, desc=desc)
@@ -31,8 +29,6 @@ def save_misclassified_images(misclassified, save_dir):
             image_name = f"misclassified_{idx}_{i}_true_{labels[i]}_predicted_{predictions[i]}.png"
             image_path = os.path.join(save_dir, image_name)
             image.save(image_path)
-
-
 
 def check_accuracy(model, dataloader, DEVICE, save_dir=None):
     model.eval()
