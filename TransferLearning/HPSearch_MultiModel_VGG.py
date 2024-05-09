@@ -321,7 +321,7 @@ for model in MODELTYPE:
 
     # Define your hyperparameter grid
     hyperparameter_grid = {
-        'learning rate': [[0.001, 0.0001, 1e-7], [0.01, 0.00001, 1e-6]],
+        'learning rate': [[0.001, 0.0001, 1e-7], [0.001, 0.00001, 1e-8]],
         'gamma': [[0.8, 0.9, 0.7], [0.1, 0.8, 0.7]],
         'batch size': [64, 128],
         "epochs": [[30, 20, 20], [30, 30, 20], [20, 35, 20]],
