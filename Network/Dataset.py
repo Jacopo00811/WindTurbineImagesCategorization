@@ -45,7 +45,7 @@ class MyDataset(Dataset):
             transformsV2.Resize((224, 224)),
             transformsV2.ToImage(), 
             transformsV2.ToDtype(torch.float32, scale=True),
-            transformsV2.Normalize(mean=[0.5750, 0.6065, 0.6459], std=[0.1854, 0.1748, 0.1794]),
+            # transformsV2.Normalize(mean=[0.5750, 0.6065, 0.6459], std=[0.1854, 0.1748, 0.1794]),
         ])
 
 
@@ -62,7 +62,7 @@ class MyDataset(Dataset):
             transformsV2.Resize((224, 224)), # Adjustable
             transformsV2.ToImage(),
             transformsV2.ToDtype(torch.float32, scale=True),
-            transformsV2.Normalize(mean=[0.5750, 0.6065, 0.6459], std=[0.1854, 0.1748, 0.1794]),
+            # transformsV2.Normalize(mean=[0.5750, 0.6065, 0.6459], std=[0.1854, 0.1748, 0.1794]),
         ])
 
 
