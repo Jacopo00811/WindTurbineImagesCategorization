@@ -191,7 +191,7 @@ transform = transformsV2.Compose([
     transformsV2.Resize((224, 224)), # Adjustable
     transformsV2.ToImage(),                          # Replace deprecated ToTensor()    
     transformsV2.ToDtype(torch.float32, scale=True), # Replace deprecated ToTensor() 
-    # transformsV2.Normalize(mean=MEAN.tolist(), std=STD.tolist()),
+    transformsV2.Normalize(mean=MEAN.tolist(), std=STD.tolist()),
     ]) 
 hyper_parameters = {
     "network name": "S35",

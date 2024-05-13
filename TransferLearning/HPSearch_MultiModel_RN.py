@@ -324,7 +324,7 @@ for model in MODELTYPE:
         'learning rate': [[0.1, 1e-4, 1e-5], [0.01, 0.00001, 1e-6]],
         'gamma': [[0.8, 0.9, 0.7], [0.1, 0.8, 0.7]],
         'batch size': [64, 128],
-        "epochs": [[30, 20, 20], [30, 30, 20], [20, 35, 20]],
+        "epochs": [[30, 30, 20], [20, 35, 20]],
         'step size': [[15, 15, 20], [20, 25, 15], [10, 25, 15]],
     }
 
@@ -338,7 +338,7 @@ for model in MODELTYPE:
 
     # Perform hyperparameter search
     # all_combinations = create_combinations(hyperparameter_grid)
-    random_samples = sample_hyperparameters(hyperparameter_grid, 10)
+    random_samples = sample_hyperparameters(hyperparameter_grid, 13)
 
     print(f"Number of combinations: {len(random_samples)} (amount of models to test)\n\n")
     best_hp = hyperparameter_search(model, loss_function, DEVICE, dataset_train, dataset_validation, dataset_test, random_samples, hyper_parameters, run_dir)
