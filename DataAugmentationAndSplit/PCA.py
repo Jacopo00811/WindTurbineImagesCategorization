@@ -11,6 +11,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 from Network.Dataset import MyDataset
+from ShowData import rescale_0_1
 
 
 def PCA_for_image(image, components):
@@ -340,9 +341,6 @@ def show_PCA_for_sample_v2(image_path, components, transform, root_directory, sp
     for i in range(3):
         fig.add_subplot(131+i)
         n_th_eigenvector = rescale_0_1(torch.from_numpy(pca.components_[i, :].reshape(image.shape[0], image.shape[1], image.shape[2])))
-        # print(f"max value: {n_th_eigenvector.max()}, min value: {n_th_eigenvector.min()}")
-        # new = rescale_0_1(n_th_eigenvector)
-        # print(f"max value: {new.max()}, min value: {new.min()}")
         plt.imshow(n_th_eigenvector.permute(1, 2, 0))
         plt.title(f"Principal Component {i+1}", fontweight='bold')
         plt.axis('off')
@@ -373,12 +371,7 @@ def show_PCA_for_sample_v2(image_path, components, transform, root_directory, sp
     plt.show()
 
 
-def rescale_0_1(image):
-    """Rescale pixel values to range [0, 1] for visualization purposes only."""
-    min_val = image.min()
-    max_val = image.max()
-    rescaled_image = (image-min_val)/abs(max_val-min_val)
-    return rescaled_image
+
 
 
 
