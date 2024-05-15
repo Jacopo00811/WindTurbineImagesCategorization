@@ -45,19 +45,31 @@ def check_accuracy(model, dataloader, DEVICE, save_dir=None):
     y_true = []
     y_pred = []
     misclassified = []
-    
+        # with torch.no_grad():
+        # for data in dataloader:
+        #     image, label = data
+        #     label -= 1  # Change the labels to start from 0
+        #     label = label.type(torch.LongTensor)
+
+        #     image = image.to(DEVICE)
+        #     label = label.to(DEVICE)
+
+        #     scores = model(image)
+        #     _, predictions = scores.max(1)
+        #     num_correct += (predictions == label).sum()
+        #     num_samples += predictions.size(0)
     with torch.no_grad():
         for data in dataloader:
             image, label = data
-            label -= 1  # Change the labels to start from 0
+            label -= 1  # Adjust labels to start from 0
             label = label.type(torch.LongTensor)
 
             image = image.to(DEVICE)
             label = label.to(DEVICE)
 
             scores = model(image)
-            _, predictions = scores.max(1)
-            num_correct += (predictions == label).sum()
+            _, predictions = torch.topk(scores, 2, dim=1)  # Get the top 2 predictions
+            num_correct += (predictions == label.unsqueeze(1)).any(1).sum().item()  # Check if the true label is in top 2 predictions
             num_samples += predictions.size(0)
             
             output = (torch.max(torch.exp(scores), 1)[1]).data.cpu().numpy()
@@ -209,7 +221,7 @@ hyper_parameters = {
     "batch size": 64,
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 260, 
+    "epochs": 260,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
