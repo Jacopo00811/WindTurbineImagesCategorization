@@ -282,6 +282,7 @@ def PCA_on_dataset_v2(root_directory, save_root, transform, split, COMPONENTS):
 def show_PCA_for_sample_v2(image_path, components, transform, root_directory, split):
     image = Image.open(image_path)
     image = transform(image)
+    image = rescale_0_1(image)
     print(f"Image size: {image.shape}")
     dataset_train = MyDataset(root_directory=root_directory, mode="train", transform=transform, split=split, pca=False)
     dataLoader_train = DataLoader(dataset_train, batch_size=1, shuffle=False, num_workers=0, drop_last=False)
