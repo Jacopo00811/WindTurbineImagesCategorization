@@ -281,11 +281,12 @@ def PCA_on_dataset_v2(root_directory, save_root, transform, split, COMPONENTS):
 def show_PCA_for_sample_v2(image_path, components, transform, root_directory, split):
     image = Image.open(image_path)
     image = transform(image)
-
+    print(f"Image size: {image.shape}")
     dataset_train = MyDataset(root_directory=root_directory, mode="train", transform=transform, split=split, pca=False)
     dataLoader_train = DataLoader(dataset_train, batch_size=1, shuffle=False, num_workers=0, drop_last=False)
+        
     all_images = np.vstack([img.reshape(img.shape[0], -1).numpy() for img, _ in dataLoader_train])
-    
+    print(f"Dataset size: {all_images.shape}")
     pca = PCA(n_components=components)
     pca.fit(all_images)
     
@@ -334,12 +335,26 @@ def show_PCA_for_sample_v2(image_path, components, transform, root_directory, sp
     plt.legend()
     plt.show()
 
+    # Plotting the first three principal components
+    fig = plt.figure(figsize = (12, 7))
+    for i in range(3):
+        fig.add_subplot(131+i)
+        n_th_eigenvector = rescale_0_1(torch.from_numpy(pca.components_[i, :].reshape(image.shape[0], image.shape[1], image.shape[2])))
+        # print(f"max value: {n_th_eigenvector.max()}, min value: {n_th_eigenvector.min()}")
+        # new = rescale_0_1(n_th_eigenvector)
+        # print(f"max value: {new.max()}, min value: {new.min()}")
+        plt.imshow(n_th_eigenvector.permute(1, 2, 0))
+        plt.title(f"Principal Component {i+1}", fontweight='bold')
+        plt.axis('off')
+    fig.suptitle("First Three Principal Components", fontweight='bold', fontsize=20, color='red')
+    plt.show()
+    
     image = image.unsqueeze(0)
     reduced_image = pca.transform(image.reshape(image.shape[0], -1).numpy())
     # transformed_image = torch.from_numpy(pca.inverse_transform(reduced_image)).reshape(1, 3, 224, 224)
     print(f"Reduce image size: {reduced_image.shape}")
     reduced_image = torch.from_numpy(reduced_image.reshape(1, 3, 5, 5))
-    print(f"Reduce image sizeafter reshape: {reduced_image.shape}")
+    print(f"Reduce image size after reshape: {reduced_image.shape}")
 
     fig = plt.figure(figsize = (10, 5)) 
     fig.add_subplot(121)
@@ -358,8 +373,12 @@ def show_PCA_for_sample_v2(image_path, components, transform, root_directory, sp
     plt.show()
 
 
-
-
+def rescale_0_1(image):
+    """Rescale pixel values to range [0, 1] for visualization purposes only."""
+    min_val = image.min()
+    max_val = image.max()
+    rescaled_image = (image-min_val)/abs(max_val-min_val)
+    return rescaled_image
 
 
 
@@ -384,11 +403,11 @@ transform = transformsV2.Compose([
     transformsV2.Resize((224, 224)), # Adjustable
     transformsV2.ToImage(),                          # Replace deprecated ToTensor()    
     transformsV2.ToDtype(torch.float32, scale=True), # Replace deprecated ToTensor() 
-    # transformsV2.Normalize(mean=MEAN.tolist(), std=STD.tolist()),
+    transformsV2.Normalize(mean=MEAN.tolist(), std=STD.tolist()),
     ]) 
 
-# show_PCA_for_sample_v2("WindTurbineImagesCategorization\\Data\\DatasetPNG\\4\\20140611_C4HY_II.png", COMPONENTS, transform, root_directory, split)
-PCA_on_dataset_v2(root_directory, save_root, transform, split, COMPONENTS)
+show_PCA_for_sample_v2("WindTurbineImagesCategorization\\Data\\DatasetPNG\\4\\20140611_C4HY_II.png", COMPONENTS, transform, root_directory, split)
+# PCA_on_dataset_v2(root_directory, save_root, transform, split, COMPONENTS)
 
 
 
