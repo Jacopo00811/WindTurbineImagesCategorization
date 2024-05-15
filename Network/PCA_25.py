@@ -15,6 +15,13 @@ import pandas as pd
 import torchvision.transforms.functional as TF
 
 
+def rescale_0_1(image):
+    """Rescale pixel values to range [0, 1] for visualization purposes only."""
+    min_val = image.min()
+    max_val = image.max()
+    rescaled_image = (image-min_val)/abs(max_val-min_val)
+    return rescaled_image
+
 def create_tqdm_bar(iterable, desc):
     return tqdm(enumerate(iterable), total=len(iterable), ncols=150, desc=desc)
 
@@ -24,7 +31,8 @@ def save_misclassified_images(misclassified, save_dir):
 
     for idx, (images, labels, predictions) in enumerate(misclassified):
         for i in range(images.size(0)):
-            image = TF.to_pil_image(images[i].cpu())
+            image = rescale_0_1(images[i])
+            image = TF.to_pil_image(image)
             image_name = f"misclassified_{idx}_{i}_true_{labels[i]}_predicted_{predictions[i]}.png"
             image_path = os.path.join(save_dir, image_name)
             image.save(image_path)
@@ -171,8 +179,6 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
 
 
 
-MEAN = np.array([0.5750, 0.6065, 0.6459])
-STD = np.array([0.1854, 0.1748, 0.1794])
 # ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPCA"
 ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPCA"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -16,6 +16,13 @@ import pandas as pd
 import torchvision.transforms.functional as TF
 
 
+def rescale_0_1(image):
+    """Rescale pixel values to range [0, 1] for visualization purposes only."""
+    min_val = image.min()
+    max_val = image.max()
+    rescaled_image = (image-min_val)/abs(max_val-min_val)
+    return rescaled_image
+
 def create_tqdm_bar(iterable, desc):
     return tqdm(enumerate(iterable), total=len(iterable), ncols=150, desc=desc)
 
@@ -25,7 +32,8 @@ def save_misclassified_images(misclassified, save_dir):
 
     for idx, (images, labels, predictions) in enumerate(misclassified):
         for i in range(images.size(0)):
-            image = TF.to_pil_image(images[i].cpu())
+            image = rescale_0_1(images[i])
+            image = TF.to_pil_image(image)
             image_name = f"misclassified_{idx}_{i}_true_{labels[i]}_predicted_{predictions[i]}.png"
             image_path = os.path.join(save_dir, image_name)
             image.save(image_path)
