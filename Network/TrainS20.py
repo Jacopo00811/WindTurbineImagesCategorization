@@ -221,7 +221,7 @@ hyper_parameters = {
     "batch size": 64,
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 260,
+    "epochs": 270,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,

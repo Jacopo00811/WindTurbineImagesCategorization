@@ -3,8 +3,22 @@ import shutil
 import PIL.Image
 from torchvision.transforms import v2 as transformsV2
 import torch
+import re
 
 
+def extract_tensor_numbers(input_string):
+    # Regular expression to find the numbers inside the brackets
+    pattern = r'tensor\(\[([\d, ]+)\]'
+
+    match = re.search(pattern, input_string)
+    if match:
+        # Extract the matched group (the numbers inside the brackets)
+        numbers_str = match.group(1)
+        numbers_list = numbers_str.split(', ')
+        return numbers_list
+    else:
+        return []
+    
 def filterWrongClassified(directory):
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
     new_directory = os.path.join(directory, "Misclassified")
@@ -56,4 +70,19 @@ def rescale_dataset(directory):
         image.save(os.path.join(directory, file_name))
 
 
-# rescale_dataset("WindTurbineImagesCategorization\\Data\\TestMis")
+def filterWrongClassified_V2(directory):
+    files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+    new_directory = os.path.join(directory, "Misclassified")
+    os.makedirs(new_directory, exist_ok=True)
+
+    for file_name in files:
+        true_label = file_name.split('_')[4]
+        predicted_labels = extract_tensor_numbers(file_name.split('_')[6])
+        print(predicted_labels)
+        if true_label not in predicted_labels:
+            print(f'The picture {file_name} has been misclassified')
+            shutil.move(os.path.join(directory, file_name), os.path.join(new_directory, file_name)) # type: ignore
+
+
+
+filterWrongClassified_V2("WindTurbineImagesCategorization\\Data\\TestMis")
