@@ -38,26 +38,30 @@ def save_misclassified_images(misclassified, save_dir):
             image_path = os.path.join(save_dir, image_name)
             image.save(image_path)
 
-def check_accuracy(model, dataloader, DEVICE, save_dir=None):
+def check_accuracy(model, dataloader, DEVICE, evaluation, save_dir=None):
     model.eval()
     num_correct = 0
     num_samples = 0
     y_true = []
     y_pred = []
     misclassified = []
-    
+
     with torch.no_grad():
         for data in dataloader:
             image, label = data
-            label -= 1  # Change the labels to start from 0
+            label -= 1  # Adjust labels to start from 0
             label = label.type(torch.LongTensor)
 
             image = image.to(DEVICE)
             label = label.to(DEVICE)
 
             scores = model(image)
-            _, predictions = scores.max(1)
-            num_correct += (predictions == label).sum()
+            if evaluation == 1:
+                _, predictions = scores.max(1)
+                num_correct += (predictions == label).sum()
+            elif evaluation == 2:
+                _, predictions = torch.topk(scores, 2, dim=1)  # Get the top 2 predictions
+                num_correct += (predictions == label.unsqueeze(1)).any(1).sum().item()  # Check if the true label is in top 2 predictions
             num_samples += predictions.size(0)
             
             output = (torch.max(torch.exp(scores), 1)[1]).data.cpu().numpy()
@@ -203,6 +207,7 @@ transform = transformsV2.Compose([
     ]) 
 hyper_parameters = {
     "network name": "S35",
+    "evaluation": 1, # 1 for top 1 classification, 2 for top 2 classification
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
@@ -261,6 +266,6 @@ if torch.cuda.is_available():
 train_net(model, loss_function, DEVICE, dataloader_train,
           dataloader_validation, optimizer, hyper_parameters, logger, scheduler, name=hyper_parameters["network name"])
 
-accuracy = check_accuracy(model, dataloader_test, DEVICE, os.path.join("Results", f'{hyper_parameters["network name"]}'))
+accuracy = check_accuracy(model, dataloader_test, DEVICE, hyper_parameters["evaluation"], os.path.join("Results", f'{hyper_parameters["network name"]}'))
 save_dir =  os.path.join("Results", f'{hyper_parameters["network name"]}_accuracy_{accuracy:.3f}.pth')
 torch.save(model.state_dict(), save_dir)

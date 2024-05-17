@@ -17,6 +17,15 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 from Network.Dataset import MyDataset
+import torchvision.transforms.functional as TF
+
+
+def rescale_0_1(image):
+    """Rescale pixel values to range [0, 1] for visualization purposes only."""
+    min_val = image.min()
+    max_val = image.max()
+    rescaled_image = (image-min_val)/abs(max_val-min_val)
+    return rescaled_image
 
 def create_tqdm_bar(iterable, desc):
     return tqdm(enumerate(iterable), total=len(iterable), ncols=150, desc=desc)
@@ -26,31 +35,55 @@ def add_layer_weight_histograms(model, logger, model_name):
         if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
             logger.add_histogram(f"{model_name}/{name}.weights", module.weight)
 
-def check_accuracy(model, dataloader, DEVICE, save_dir=None):
+def save_misclassified_images(misclassified, save_dir):
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    for idx, (images, labels, predictions) in enumerate(misclassified):
+        for i in range(images.size(0)):
+            image = rescale_0_1(images[i])
+            image = TF.to_pil_image(image)
+            image_name = f"misclassified_{idx}_{i}_true_{labels[i]}_predicted_{predictions[i]}.png"
+            image_path = os.path.join(save_dir, image_name)
+            image.save(image_path)
+
+def check_accuracy(model, dataloader, DEVICE, evaluation, save_dir=None):
     model.eval()
     num_correct = 0
     num_samples = 0
     y_true = []
     y_pred = []
-    
+    misclassified = []
+
     with torch.no_grad():
         for data in dataloader:
             image, label = data
-            label -= 1  # Change the labels to start from 0
+            label -= 1  # Adjust labels to start from 0
             label = label.type(torch.LongTensor)
 
             image = image.to(DEVICE)
             label = label.to(DEVICE)
 
             scores = model(image)
-            _, predictions = scores.max(1)
-            num_correct += (predictions == label).sum()
+            if evaluation == 1:
+                _, predictions = scores.max(1)
+                num_correct += (predictions == label).sum()
+            elif evaluation == 2:
+                _, predictions = torch.topk(scores, 2, dim=1)  # Get the top 2 predictions
+                num_correct += (predictions == label.unsqueeze(1)).any(1).sum().item()  # Check if the true label is in top 2 predictions
             num_samples += predictions.size(0)
             
             output = (torch.max(torch.exp(scores), 1)[1]).data.cpu().numpy()
             y_pred.extend(output) # Save Prediction
             label = label.data.cpu().numpy()
             y_true.extend(label) # Save Truth
+
+            # Check for misclassified images
+            misclassified_mask = predictions != label
+            misclassified_images = image[misclassified_mask]
+            misclassified_labels = label[misclassified_mask]
+            misclassified_predictions = predictions[misclassified_mask]
+            misclassified.extend(zip(misclassified_images, misclassified_labels, misclassified_predictions))
 
     accuracy = float(num_correct)/float(num_samples)
     print(f"Got {num_correct}/{num_samples} with accuracy {accuracy* 100:.3f}")
@@ -71,7 +104,9 @@ def check_accuracy(model, dataloader, DEVICE, save_dir=None):
             os.makedirs(save_dir)
         plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
         plt.close()
-
+    
+    save_misclassified_images(misclassified, save_dir)
+    
     model.train()
     return accuracy
 
@@ -226,7 +261,7 @@ def automatic_fine_tune(hyper_parameters, modeltype, device, loss_function, data
     print("\nFinished fine tuning all layers!\n")
     
     # Check accuracy and save model
-    accuracy = check_accuracy(model, dataloader_test, device, os.path.join("Results", f'{new_hp["network name"]}'))
+    accuracy = check_accuracy(model, dataloader_test, device, new_hp["evaluation"], os.path.join("Results", f'{new_hp["network name"]}'))
     save_dir =  os.path.join("Results", f'{new_hp["network name"]}_accuracy_{accuracy:.3f}.pth')
     torch.save(model.state_dict(), save_dir)
 
@@ -264,6 +299,7 @@ transform = transformsV2.Compose([
     ]) 
 hyper_parameters = {
     "network name": "",
+    "evaluation": 1, # 1 for top 1 classification, 2 for top 2 classification
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
