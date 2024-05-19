@@ -183,8 +183,8 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
 
 
 
-ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPCA"
-# ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPCA"
+# ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPCA"
+ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPCA"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 
@@ -198,7 +198,7 @@ hyper_parameters = {
     "batch size": 64,
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 2,
+    "epochs": 15,
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
