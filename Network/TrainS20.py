@@ -207,7 +207,7 @@ transform = transformsV2.Compose([
     ]) 
 hyper_parameters = {
     "network name": "S20",
-    "evaluation": 1, # 1 for top 1 classification, 2 for top 2 classification
+    "evaluation": 2, # 1 for top 1 classification, 2 for top 2 classification
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},

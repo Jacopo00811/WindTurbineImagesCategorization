@@ -190,7 +190,7 @@ print(f"Device in use: {DEVICE}")
 
 hyper_parameters = {
     "network name": "S35_PCA",
-    "evaluation": 1, # 1 for top 1 classification, 2 for top 2 classification
+    "evaluation": 2, # 1 for top 1 classification, 2 for top 2 classification
     "PCA": True,
     "input channels": 3,
     "number of classes": 5,
