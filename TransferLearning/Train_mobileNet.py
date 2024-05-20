@@ -142,8 +142,8 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
             training_loss += loss_train.item()
 
             # Add the model graph to tensorboard
-            if epoch == 0 and train_iteration == 0:
-                logger.add_graph(model, images)
+            # if epoch == 0 and train_iteration == 0:
+            #     logger.add_graph(model, images)
 
             # Running train accuracy
             _, predicted = predicted_labels.max(1)
@@ -279,6 +279,7 @@ def automatic_fine_tune(hyper_parameters, modeltype, device, loss_function, data
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
 MODELTYPE = ["mobilenet_v3_large", "resnet152", "vgg19_bn"]
+model = MODELTYPE[0]
 # ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPNG"
 ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPNG"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -303,17 +304,17 @@ hyper_parameters = {
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
-    "batch size": 32,
+    "batch size": 64,
     "number of workers": 0,
     # These below are modifiable hyperparameters
-    "learning rate": [0.001, 0.0001, 1e-07], 
-    "epochs": [30, 15, 20], 
+    "learning rate": [0.1, 0.001, 0.0001], 
+    "epochs": [30, 25, 25], 
     "beta1": 0.9, 
     "beta2": 0.999, 
     "epsilon": 1e-08, 
     "weight decay": 1e-08, 
-    "step size": [15, 7, 15], 
-    "gamma": [0.5, 0.8, 0.9]
+    "step size": [25, 20, 15], 
+    "gamma": [0.8, 0.9, 0.7]
 }
 
 # Create Datasets and Dataloaders
@@ -337,9 +338,7 @@ loss_function = nn.CrossEntropyLoss()
 if torch.cuda.is_available():
     torch.cuda.empty_cache()
 
-
-for model in MODELTYPE:
-    hyper_parameters["network name"] = model
-    # Fine tune the network
-    automatic_fine_tune(hyper_parameters, model, DEVICE, loss_function, dataloader_train, dataloader_validation, dataloader_test)
+hyper_parameters["network name"] = model
+# Fine tune the network
+automatic_fine_tune(hyper_parameters, model, DEVICE, loss_function, dataloader_train, dataloader_validation, dataloader_test)
 
