@@ -307,14 +307,14 @@ hyper_parameters = {
     "batch size": 64,
     "number of workers": 0,
     # These below are modifiable hyperparameters
-    "learning rate": [0.1, 0.001, 0.0001], 
+    "learning rate": [0.01, 0.0001, 0.0001], 
     "epochs": [30, 30, 20], 
     "beta1": 0.9, 
     "beta2": 0.999, 
     "epsilon": 1e-08, 
     "weight decay": 1e-08, 
     "step size": [10, 25, 15], 
-    "gamma": [0.8, 0.9, 0.7]
+    "gamma": [0.8, 0.9, 0.5]
 }
 
 # Create Datasets and Dataloaders
