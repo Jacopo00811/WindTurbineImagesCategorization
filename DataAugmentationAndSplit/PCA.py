@@ -297,7 +297,7 @@ def show_PCA_for_sample_v2(image_path, components, transform, root_directory, sp
     blue_channel = image[0, :, :]
 
     # Plotting the original image
-    plt.title("Original Image", fontweight='bold', fontsize=20, color='red')
+    plt.title("Original Image", fontweight='bold')
     plt.imshow(image.permute(1, 2, 0))
     plt.axis('off')
     plt.show()
@@ -320,9 +320,9 @@ def show_PCA_for_sample_v2(image_path, components, transform, root_directory, sp
     plt.show()
 
     # Plotting the explained variance ratios V1
-    plt.title("PCA Analysis", fontweight='bold', fontsize=20, color='red')
-    plt.xlabel("Number of components")
-    plt.ylabel("Cumulative explained variance")
+    plt.title("PCA Analysis", fontweight='bold')
+    plt.xlabel("Number of components", fontweight='bold')
+    plt.ylabel("Cumulative explained variance", fontweight='bold')
     plt.plot(np.cumsum(pca.explained_variance_ratio_), linestyle='-', color='blue', marker='x', markeredgecolor='black')
     plt.grid(True)
     plt.yticks(np.arange(0, 1.1, 0.05))
@@ -330,9 +330,9 @@ def show_PCA_for_sample_v2(image_path, components, transform, root_directory, sp
     plt.show()
 
     # Plotting the explained variance ratios V2
-    plt.title("PCA Analysis", fontweight='bold', fontsize=20, color='red')
-    plt.ylabel('Variation explained')
-    plt.xlabel('Eigen Value')
+    plt.title("PCA Analysis", fontweight='bold')
+    plt.ylabel('Variation explained', fontweight='bold')
+    plt.xlabel('Eigenvalues', fontweight='bold')
     plt.bar(list(range(1, components+1)), pca.explained_variance_ratio_, color='blue', label=f'Explained Variance Ratio ({np.sum(pca.explained_variance_ratio_):.4f})')
     plt.legend()
     plt.show()
@@ -399,8 +399,8 @@ transform = transformsV2.Compose([
     transformsV2.ToDtype(torch.float32, scale=True), # Replace deprecated ToTensor() 
     transformsV2.Normalize(mean=MEAN.tolist(), std=STD.tolist()),
     ]) 
-
-show_PCA_for_sample_v2("WindTurbineImagesCategorization\\Data\\DatasetPNG\\4\\20140611_C4HY_II.png", COMPONENTS, transform, root_directory, split)
+path = "WindTurbineImagesCategorization\\Data\\DatasetPNG\\5\\20180328_C9WC_IV.png"
+show_PCA_for_sample_v2(path, COMPONENTS, transform, root_directory, split)
 # PCA_on_dataset_v2(root_directory, save_root, transform, split, COMPONENTS)
 
 
