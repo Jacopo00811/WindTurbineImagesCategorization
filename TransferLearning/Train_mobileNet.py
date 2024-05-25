@@ -300,14 +300,14 @@ transform = transformsV2.Compose([
     ]) 
 hyper_parameters = {
     "network name": "",
-    "evaluation": 1, # 1 for top 1 classification, 2 for top 2 classification
+    "evaluation": 2, # 1 for top 1 classification, 2 for top 2 classification
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
     "batch size": 64,
     "number of workers": 0,
     # These below are modifiable hyperparameters
-    "learning rate": [0.01, 0.001, 0.00001], 
+    "learning rate": [0.01, 0.001, 0.0001], 
     "epochs": [30, 25, 25], 
     "beta1": 0.9, 
     "beta2": 0.999, 
