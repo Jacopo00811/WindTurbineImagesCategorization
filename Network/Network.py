@@ -81,7 +81,7 @@ class MyNetwork(nn.Module):
 
         if self.pca:
             self.fully_connected_layers = nn.Sequential(
-                nn.Linear(12800, 2048),
+                nn.Linear(512*5*5, 2048),
                 nn.LeakyReLU(),
                 nn.Dropout(0.5),
                 nn.Linear(2048, 1024),

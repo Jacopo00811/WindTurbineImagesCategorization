@@ -59,41 +59,40 @@ def check_accuracy(model, dataloader, DEVICE, evaluation, save_dir=None):
             if evaluation == 1:
                 _, predictions = scores.max(1)
                 num_correct += (predictions == label).sum()
-                y_pred.extend(predictions.cpu().numpy())  # Save top-1 predictions
             elif evaluation == 2:
-                _, top2_predictions = torch.topk(scores, 2, dim=1)  # Get the top 2 predictions
-                num_correct += (top2_predictions == label.unsqueeze(1)).any(1).sum().item()  # Check if the true label is in top 2 predictions
-                y_pred.extend(top2_predictions.cpu().numpy())  # Save top-2 predictions
+                _, predictions = torch.topk(scores, 2, dim=1)  # Get the top 2 predictions
+                num_correct += (predictions == label.unsqueeze(1)).any(1).sum().item()  # Check if the true label is in top 2 predictions
             num_samples += predictions.size(0)
+            
 
-            label = label.cpu().numpy()
-            y_true.extend(label)  # Save true labels
+            y_pred.extend(predictions.cpu().tolist()) # Save Prediction
+            label = label.data.cpu().numpy()
+            
+            # Handle the case for top 2 classification and confusion matrix
+            if evaluation == 2:
+                if label[0] in y_pred[-1]:
+                    y_pred[-1] = label[0]
+                else:
+                    y_pred[-1] = y_pred[-1][0]
+                    
+            y_true.extend(label) # Save Truth
 
             # Check for misclassified images
-            misclassified_mask = (predictions != label)
+            misclassified_mask = predictions != label
             misclassified_images = image[misclassified_mask]
             misclassified_labels = label[misclassified_mask]
             misclassified_predictions = predictions[misclassified_mask]
             misclassified.extend(zip(misclassified_images, misclassified_labels, misclassified_predictions))
 
-    accuracy = float(num_correct) / float(num_samples)
-    print(f"Got {num_correct}/{num_samples} with accuracy {accuracy * 100:.3f}")
+    accuracy = float(num_correct)/float(num_samples)
+    print(f"Got {num_correct}/{num_samples} with accuracy {accuracy* 100:.3f}")
     classes = ('1', '2', '3', '4', '5') 
     
     # Create confusion matrix
-    if evaluation == 1:
-        cf_matrix = confusion_matrix(y_true, y_pred)
-    elif evaluation == 2:
-        cf_matrix = np.zeros((len(classes), len(classes)), dtype=int)
-        for true, preds in zip(y_true, y_pred):
-            for pred in preds:  # Check if true label is within the top-2 predictions
-                cf_matrix[true][pred] += 1
-                if true == pred:
-                    break
-
-    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None], index=[i for i in classes],
-                         columns=[i for i in classes])
-    plt.figure(figsize=(12, 7))
+    cf_matrix = confusion_matrix(y_true, y_pred)
+    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None], index = [i for i in classes],
+                     columns = [i for i in classes])
+    plt.figure(figsize = (12,7))
     sn.set_theme(font_scale=1.2)
     sn.heatmap(df_cm, annot=True, fmt='.2f', cmap='Blues', xticklabels=classes, yticklabels=classes)
     plt.xlabel('Predicted Label')
@@ -104,74 +103,11 @@ def check_accuracy(model, dataloader, DEVICE, evaluation, save_dir=None):
             os.makedirs(save_dir)
         plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
         plt.close()
-
+    
     save_misclassified_images(misclassified, save_dir)
-
+    
     model.train()
     return accuracy
-
-# def check_accuracy(model, dataloader, DEVICE, evaluation, save_dir=None):
-#     model.eval()
-#     num_correct = 0
-#     num_samples = 0
-#     y_true = []
-#     y_pred = []
-#     misclassified = []
-
-#     with torch.no_grad():
-#         for data in dataloader:
-#             image, label = data
-#             label -= 1  # Adjust labels to start from 0
-#             label = label.type(torch.LongTensor)
-
-#             image = image.to(DEVICE)
-#             label = label.to(DEVICE)
-
-#             scores = model(image)
-#             if evaluation == 1:
-#                 _, predictions = scores.max(1)
-#                 num_correct += (predictions == label).sum()
-#             elif evaluation == 2:
-#                 _, predictions = torch.topk(scores, 2, dim=1)  # Get the top 2 predictions
-#                 num_correct += (predictions == label.unsqueeze(1)).any(1).sum().item()  # Check if the true label is in top 2 predictions
-#             num_samples += predictions.size(0)
-            
-#             output = (torch.max(torch.exp(scores), 1)[1]).data.cpu().numpy()
-#             y_pred.extend(output) # Save Prediction
-#             label = label.data.cpu().numpy()
-#             y_true.extend(label) # Save Truth
-
-#             # Check for misclassified images
-#             misclassified_mask = predictions != label
-#             misclassified_images = image[misclassified_mask]
-#             misclassified_labels = label[misclassified_mask]
-#             misclassified_predictions = predictions[misclassified_mask]
-#             misclassified.extend(zip(misclassified_images, misclassified_labels, misclassified_predictions))
-
-#     accuracy = float(num_correct)/float(num_samples)
-#     print(f"Got {num_correct}/{num_samples} with accuracy {accuracy* 100:.3f}")
-#     classes = ('1', '2', '3', '4', '5') 
-    
-#     # Create confusion matrix
-#     cf_matrix = confusion_matrix(y_true, y_pred)
-#     df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1)[:, None], index = [i for i in classes],
-#                      columns = [i for i in classes])
-#     plt.figure(figsize = (12,7))
-#     sn.set_theme(font_scale=1.2)
-#     sn.heatmap(df_cm, annot=True, fmt='.2f', cmap='Blues', xticklabels=classes, yticklabels=classes)
-#     plt.xlabel('Predicted Label')
-#     plt.ylabel('True Label')
-#     plt.title(f'Confusion Matrix', fontsize=20, fontweight='bold', color='red')
-#     if save_dir:
-#         if not os.path.exists(save_dir):
-#             os.makedirs(save_dir)
-#         plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
-#         plt.close()
-    
-#     save_misclassified_images(misclassified, save_dir)
-    
-#     model.train()
-#     return accuracy
 
 def train_net(model, loss_function, device, dataloader_train, dataloader_validation, optimizer, hyper_parameters, logger, scheduler, name="default"):
     epochs = hyper_parameters["epochs"]
@@ -258,8 +194,8 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
 
 MEAN = np.array([0.5750, 0.6065, 0.6459])
 STD = np.array([0.1854, 0.1748, 0.1794])
-# ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPNG"
-ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPNG"
+ROOT_DIRECTORY = "c:\\Users\\jacop\\Desktop\\BSc\\Code\\WindTurbineImagesCategorization\\Data\\DatasetPNG"
+# ROOT_DIRECTORY = "/zhome/f9/0/168881/Desktop/WindTurbineImagesCategorization/Data/DatasetPNG"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device in use: {DEVICE}")
 
@@ -283,10 +219,10 @@ hyper_parameters = {
     "input channels": 3,
     "number of classes": 5,
     "split": {"train": 0.6, "val": 0.2, "test": 0.2},
-    "batch size": 64,
+    "batch size": 32, # 64
     "number of workers": 0,
     "learning rate": 0.001,
-    "epochs": 270,
+    "epochs": 1, #270
     "beta1": 0.9,
     "beta2": 0.999,
     "epsilon": 1e-08,
