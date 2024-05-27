@@ -62,11 +62,18 @@ def check_accuracy(model, dataloader, DEVICE, evaluation, save_dir=None):
             elif evaluation == 2:
                 _, predictions = torch.topk(scores, 2, dim=1)  # Get the top 2 predictions
                 num_correct += (predictions == label.unsqueeze(1)).any(1).sum().item()  # Check if the true label is in top 2 predictions
-            num_samples += predictions.size(0)
             
-            output = (torch.max(torch.exp(scores), 1)[1]).data.cpu().numpy()
-            y_pred.extend(output) # Save Prediction
+            num_samples += predictions.size(0)
+            y_pred.extend(predictions.cpu().tolist()) # Save Prediction
             label = label.data.cpu().numpy()
+            
+            # Handle the case for top 2 classification and confusion matrix
+            if evaluation == 2:
+                if label[0] in y_pred[-1]:
+                    y_pred[-1] = label[0]
+                else:
+                    y_pred[-1] = y_pred[-1][0]
+                    
             y_true.extend(label) # Save Truth
 
             # Check for misclassified images
