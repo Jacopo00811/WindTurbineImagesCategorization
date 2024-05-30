@@ -85,4 +85,4 @@ def filterWrongClassified_V2(directory):
 
 
 
-filterWrongClassified_V2("WindTurbineImagesCategorization\\Data\\TestMis")
+filterWrongClassified_V2("WindTurbineImagesCategorization\\Data\\Test")
