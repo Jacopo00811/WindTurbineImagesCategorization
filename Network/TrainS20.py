@@ -168,6 +168,11 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
                 # Forward pass
                 output = model(images)
 
+                # Running validation accuracy
+                _, predicted = output.max(1)
+                num_correct = (predicted == labels).sum()
+                val_accuracy = float(num_correct)/float(images.shape[0])
+
                 # Calculate the loss
                 loss_val = loss_function(output, labels)
 
@@ -179,6 +184,7 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
                 # Update the tensorboard logger.
                 logger.add_scalar(f'{name}/Validation loss', validation_loss/(
                     val_iteration+1), epoch*len(dataloader_validation)+val_iteration)
+                logger.add_scalar(f'{name}/Validation accuracy', val_accuracy, epoch*len(dataloader_validation)+val_iteration)
             
 
         # This value is for the progress bar of the training loop.
@@ -186,6 +192,7 @@ def train_net(model, loss_function, device, dataloader_train, dataloader_validat
 
         logger.add_scalars(f'{name}/Combined', {'Validation loss': validation_loss,
                                                 'Train loss': training_loss/len(dataloader_train)}, epoch)
+        logger.add_scalars(f'{name}/CombinedAccuracies', {'Validation accuracy': val_accuracy, 'Train accuracy': train_accuracy}, epoch)
         scheduler.step()
         print(f"Current learning rate: {scheduler.get_last_lr()}")
 
