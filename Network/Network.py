@@ -2,6 +2,8 @@ import torch.nn as nn
 import torch.nn.init as init
 
 class MyNetwork(nn.Module):
+    """ Class defining the network architecture, the forward pass, the weight initialization and add a method to count 
+    the number of parameters of the network."""
     def __init__(self, hyper_parameters):
         super(MyNetwork, self).__init__()
         self.input_channels = hyper_parameters["input channels"]
