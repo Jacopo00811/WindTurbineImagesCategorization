@@ -92,7 +92,6 @@ Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/jacopo00811/wind-turbine-blade-classification.git
 cd wind-turbine-blade-classification
-pip install -r requirements.txt
 ```
 
 ## Authors
