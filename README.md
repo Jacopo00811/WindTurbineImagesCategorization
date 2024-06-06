@@ -90,7 +90,7 @@ Future improvements include:
 ### Installation
 Clone the repository and install the dependencies:
 ```bash
-git clone https://github.com/jacopo00811/WindTurbineImagesCategorization.git
+git clone https://github.com/Jacopo00811/WindTurbineImagesCategorization.git
 cd WindTurbineImagesCategorization
 ```
 
