@@ -11,7 +11,6 @@ This repository contains all the code used for the project, which consists of mu
 - [Introduction](#introduction)
 - [Dataset](#dataset)
   - [Data Preprocessing](#data-preprocessing)
-  - [Data Cleaning](#data-cleaning)
 - [Model Architecture](#model-architecture)
   - [Proposed CNNs](#proposed-cnns)
   - [Pre-trained Models](#pre-trained-models)
