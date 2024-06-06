@@ -90,8 +90,8 @@ Future improvements include:
 ### Installation
 Clone the repository and install the dependencies:
 ```bash
-git clone https://github.com/jacopo00811/wind-turbine-blade-classification.git
-cd wind-turbine-blade-classification
+git clone https://github.com/jacopo00811/WindTurbineImagesCategorization.git
+cd WindTurbineImagesCategorization
 ```
 
 ## Authors
