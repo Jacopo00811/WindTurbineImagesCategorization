@@ -1,6 +1,6 @@
 # BSc Thesis Project: Wind Turbine Leading Edge Damage Categorization Using Deep Learning-Aided Image Recognition and Assessment of Its Effect on Aerodynamic Performance
 
-Welcome to the GitHub repository for the BSc thesis project. This project is part of the final thesis submitted for the Bachelor of Science in Engineering at the Technical University of Denmark (DTU).
+Welcome to the GitHub repository for this BSc thesis project. This project is part of the final thesis submitted for the Bachelor of Science in Engineering, General Engineering Cyber System, at the Technical University of Denmark (DTU).
 
 ## Overview
 
@@ -28,7 +28,7 @@ This repository contains all the code used for the project, which consists of mu
 
 ## Introduction
 
-This project aims to create a medium-sized neural network capable of classifying images of leading edge damage automatically with high accuracy, thus enhancing the overall efficiency and reliability of wind turbine maintenance. The project also involves comparing the proposed CNNs with three pre-trained models using transfer learning and fine-tuning to fit the specific classification task.
+This project aims to create a medium-sized neural network capable of automatically classifying images of turbine blades leading edge damages and thier impact on aerodynamics performance with high accuracy, thus enhancing the overall efficiency and reliability of wind turbine maintenance. The project also involves comparing the proposed CNNs with three pre-trained models using transfer learning and fine-tuning to fit the specific classification task.
 
 ## Dataset
 The dataset consists of high-resolution images taken during turbine inspections, which were classified into one of five categories based on the severity of aerodynamic defects:
